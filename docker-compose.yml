@@ -8,6 +8,7 @@ volumes:
 services:
 
   postgres:
+    # https://github.com/postgis/docker-postgis
     image: postgis/postgis
     restart: always
     volumes:

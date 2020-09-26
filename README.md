@@ -15,4 +15,4 @@
 ```bash
 docker-compose up
 ```
-2. Run migrations by navigating to the migrations directory (`cd migrations`) and executing `make init`.
+2. Run migrations by navigating to the migrations' directory (`cd migrations`) and executing `make init`.
