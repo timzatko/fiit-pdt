@@ -12,6 +12,8 @@ import (
 	"regexp"
 	"sync"
 
+	"github.com/go-pg/pg"
+
 	"github.com/timzatko/fiit-pdt/internal/database"
 )
 
@@ -28,7 +30,7 @@ func main() {
 	fmt.Print("reading files...")
 	fmt.Print(files)
 
-	readFiles(dataDir, files)
+	readFiles(db, dataDir, files)
 }
 
 func getFiles(dataDir string) []string {
@@ -48,20 +50,17 @@ func getFiles(dataDir string) []string {
 	return fileNames
 }
 
-func readFiles(dataDir string, files []string) {
+func readFiles(db *pg.DB, dataDir string, files []string) {
 	var wg sync.WaitGroup
-
 	for _, file := range files {
 		wg.Add(1)
-		go readFile(&wg, dataDir, file)
+		go readFile(db, &wg, dataDir, file)
 	}
-
 	wg.Wait()
 }
 
-func readFile(wg *sync.WaitGroup, dataDir string, fileName string) {
+func readFile(db *pg.DB, wg *sync.WaitGroup, dataDir string, fileName string) {
 	defer wg.Done()
-	var jsonWg sync.WaitGroup
 
 	log.Printf("reading file %s...", fileName)
 
@@ -93,33 +92,132 @@ func readFile(wg *sync.WaitGroup, dataDir string, fileName string) {
 		}
 	}()
 
+	q := Queue{
+		Accounts: []Account{},
+		db:       db,
+	}
+
 	s := bufio.NewScanner(gz)
 	for s.Scan() {
-		wg.Add(1)
-		go parseJson([]byte(s.Text()))
+		j := s.Text()
+		rt, err := parseJson([]byte(j))
+
+		if err != nil {
+			log.Printf("unable to unmarshal %s", j)
+			continue
+		}
+
+		q.add(rt)
+
+		if q.isFull() {
+			q.send()
+		}
 	}
+
+	if !q.isEmpty() {
+		q.send()
+	}
+
+	q.wg.Wait()
 
 	if err := s.Err(); err != nil {
 		log.Panic(err)
 	}
 
-	jsonWg.Wait()
 	log.Printf("done %s...", fileName)
 }
 
-func parseJson(j []byte) {
-	var t Tweet
-	err := json.Unmarshal(j, &t)
-
-	if err != nil {
-		log.Panicf("unable to unmarshal json: %s", err)
-	}
-
-	// log.Print(t)
+func parseJson(j []byte) (RawTweet, error) {
+	var rt RawTweet
+	err := json.Unmarshal(j, &rt)
+	return rt, err
 }
 
-// Tweet interface generated with https://mholt.github.io/json-to-go/
-type Tweet struct {
+type Queue struct {
+	Accounts      []Account
+	wg            sync.WaitGroup
+	db            *pg.DB
+	AccountsMutex sync.Mutex
+}
+
+func (q *Queue) isFull() bool {
+	return len(q.Accounts) >= 1000
+}
+
+func (q *Queue) isEmpty() bool {
+	return len(q.Accounts) == 0
+}
+
+func (q *Queue) send() {
+	if !q.isFull() {
+		return
+	}
+
+	q.wg.Add(1)
+
+	a := q.Accounts
+	q.Accounts = []Account{}
+
+	go func() {
+		// TODO: common mutex for all files running in parallel
+		q.AccountsMutex.Lock()
+		_, err := q.db.Model(&a).OnConflict("DO NOTHING").Insert()
+		q.AccountsMutex.Unlock()
+
+		if err != nil {
+			q.AccountsMutex.Unlock()
+			log.Panicf("error while inserting: %s", err)
+		}
+
+		// TODO: insert to hashtags
+		// TODO: insert to countries
+		// TODO: insert to tweets
+		// TODO: insert to tweet_hashtags
+		// TODO: insert to tweet_mentions
+
+		defer q.wg.Done()
+	}()
+}
+
+func (q *Queue) add(rt RawTweet) {
+	acc := Account{
+		Id:             rt.User.ID,
+		ScreenName:     rt.User.ScreenName,
+		Name:           rt.User.Name,
+		Description:    rt.User.Description,
+		FollowersCount: rt.User.FollowersCount,
+		FriendsCount:   rt.User.FriendsCount,
+		StatusesCount:  rt.User.StatusesCount,
+	}
+
+	q.Accounts = append(q.Accounts, acc)
+}
+
+//type Tweet struct {
+//	Id            string
+//	Content       string
+//	Location      interface{}
+//	RetweetCount  int
+//	FavoriteCount int
+//	HappenedAt    time.Time
+//	AuthorId      int64
+//	Author        *Account `pg:"rel:has-one"`
+//	CountryId     int
+//	ParentId      string
+//}
+
+type Account struct {
+	Id             int64
+	ScreenName     string
+	Name           string
+	Description    string
+	FollowersCount int
+	FriendsCount   int
+	StatusesCount  int
+}
+
+// RawTweet interface generated with https://mholt.github.io/json-to-go/
+type RawTweet struct {
 	CreatedAt        string `json:"created_at"`
 	ID               int64  `json:"id"`
 	IDStr            string `json:"id_str"`
@@ -143,81 +241,78 @@ type Tweet struct {
 	InReplyToUserID      interface{} `json:"in_reply_to_user_id"`
 	InReplyToUserIDStr   interface{} `json:"in_reply_to_user_id_str"`
 	InReplyToScreenName  interface{} `json:"in_reply_to_screen_name"`
-	User                 User        `json:"user"`
-	Geo                  interface{} `json:"geo"`
-	Coordinates          interface{} `json:"coordinates"`
-	Place                interface{} `json:"place"`
-	Contributors         interface{} `json:"contributors"`
-	IsQuoteStatus        bool        `json:"is_quote_status"`
-	RetweetCount         int         `json:"retweet_count"`
-	FavoriteCount        int         `json:"favorite_count"`
-	Favorited            bool        `json:"favorited"`
-	Retweeted            bool        `json:"retweeted"`
-	PossiblySensitive    bool        `json:"possibly_sensitive"`
-	Lang                 string      `json:"lang"`
-}
-
-// User interface generated with https://mholt.github.io/json-to-go/
-type User struct {
-	ID          int64  `json:"id"`
-	IDStr       string `json:"id_str"`
-	Name        string `json:"name"`
-	ScreenName  string `json:"screen_name"`
-	Location    string `json:"location"`
-	Description string `json:"description"`
-	URL         string `json:"url"`
-	Entities    struct {
-		URL struct {
-			Urls []struct {
-				URL         string `json:"url"`
-				ExpandedURL string `json:"expanded_url"`
-				DisplayURL  string `json:"display_url"`
-				Indices     []int  `json:"indices"`
-			} `json:"urls"`
-		} `json:"url"`
-		Description struct {
-			Urls []struct {
-				URL         string `json:"url"`
-				ExpandedURL string `json:"expanded_url"`
-				DisplayURL  string `json:"display_url"`
-				Indices     []int  `json:"indices"`
-			} `json:"urls"`
-		} `json:"description"`
-	} `json:"entities"`
-	Protected                      bool        `json:"protected"`
-	FollowersCount                 int         `json:"followers_count"`
-	FriendsCount                   int         `json:"friends_count"`
-	ListedCount                    int         `json:"listed_count"`
-	CreatedAt                      string      `json:"created_at"`
-	FavouritesCount                int         `json:"favourites_count"`
-	UtcOffset                      interface{} `json:"utc_offset"`
-	TimeZone                       interface{} `json:"time_zone"`
-	GeoEnabled                     bool        `json:"geo_enabled"`
-	Verified                       bool        `json:"verified"`
-	StatusesCount                  int         `json:"statuses_count"`
-	Lang                           interface{} `json:"lang"`
-	ContributorsEnabled            bool        `json:"contributors_enabled"`
-	IsTranslator                   bool        `json:"is_translator"`
-	IsTranslationEnabled           bool        `json:"is_translation_enabled"`
-	ProfileBackgroundColor         string      `json:"profile_background_color"`
-	ProfileBackgroundImageURL      string      `json:"profile_background_image_url"`
-	ProfileBackgroundImageURLHTTPS string      `json:"profile_background_image_url_https"`
-	ProfileBackgroundTile          bool        `json:"profile_background_tile"`
-	ProfileImageURL                string      `json:"profile_image_url"`
-	ProfileImageURLHTTPS           string      `json:"profile_image_url_https"`
-	ProfileBannerURL               string      `json:"profile_banner_url"`
-	ProfileImageExtensionsAltText  interface{} `json:"profile_image_extensions_alt_text"`
-	ProfileBannerExtensionsAltText interface{} `json:"profile_banner_extensions_alt_text"`
-	ProfileLinkColor               string      `json:"profile_link_color"`
-	ProfileSidebarBorderColor      string      `json:"profile_sidebar_border_color"`
-	ProfileSidebarFillColor        string      `json:"profile_sidebar_fill_color"`
-	ProfileTextColor               string      `json:"profile_text_color"`
-	ProfileUseBackgroundImage      bool        `json:"profile_use_background_image"`
-	HasExtendedProfile             bool        `json:"has_extended_profile"`
-	DefaultProfile                 bool        `json:"default_profile"`
-	DefaultProfileImage            bool        `json:"default_profile_image"`
-	Following                      bool        `json:"following"`
-	FollowRequestSent              bool        `json:"follow_request_sent"`
-	Notifications                  bool        `json:"notifications"`
-	TranslatorType                 string      `json:"translator_type"`
+	User                 struct {
+		ID          int64  `json:"id"`
+		IDStr       string `json:"id_str"`
+		Name        string `json:"name"`
+		ScreenName  string `json:"screen_name"`
+		Location    string `json:"location"`
+		Description string `json:"description"`
+		URL         string `json:"url"`
+		Entities    struct {
+			URL struct {
+				Urls []struct {
+					URL         string `json:"url"`
+					ExpandedURL string `json:"expanded_url"`
+					DisplayURL  string `json:"display_url"`
+					Indices     []int  `json:"indices"`
+				} `json:"urls"`
+			} `json:"url"`
+			Description struct {
+				Urls []struct {
+					URL         string `json:"url"`
+					ExpandedURL string `json:"expanded_url"`
+					DisplayURL  string `json:"display_url"`
+					Indices     []int  `json:"indices"`
+				} `json:"urls"`
+			} `json:"description"`
+		} `json:"entities"`
+		Protected                      bool        `json:"protected"`
+		FollowersCount                 int         `json:"followers_count"`
+		FriendsCount                   int         `json:"friends_count"`
+		ListedCount                    int         `json:"listed_count"`
+		CreatedAt                      string      `json:"created_at"`
+		FavouritesCount                int         `json:"favourites_count"`
+		UtcOffset                      interface{} `json:"utc_offset"`
+		TimeZone                       interface{} `json:"time_zone"`
+		GeoEnabled                     bool        `json:"geo_enabled"`
+		Verified                       bool        `json:"verified"`
+		StatusesCount                  int         `json:"statuses_count"`
+		Lang                           interface{} `json:"lang"`
+		ContributorsEnabled            bool        `json:"contributors_enabled"`
+		IsTranslator                   bool        `json:"is_translator"`
+		IsTranslationEnabled           bool        `json:"is_translation_enabled"`
+		ProfileBackgroundColor         string      `json:"profile_background_color"`
+		ProfileBackgroundImageURL      string      `json:"profile_background_image_url"`
+		ProfileBackgroundImageURLHTTPS string      `json:"profile_background_image_url_https"`
+		ProfileBackgroundTile          bool        `json:"profile_background_tile"`
+		ProfileImageURL                string      `json:"profile_image_url"`
+		ProfileImageURLHTTPS           string      `json:"profile_image_url_https"`
+		ProfileBannerURL               string      `json:"profile_banner_url"`
+		ProfileImageExtensionsAltText  interface{} `json:"profile_image_extensions_alt_text"`
+		ProfileBannerExtensionsAltText interface{} `json:"profile_banner_extensions_alt_text"`
+		ProfileLinkColor               string      `json:"profile_link_color"`
+		ProfileSidebarBorderColor      string      `json:"profile_sidebar_border_color"`
+		ProfileSidebarFillColor        string      `json:"profile_sidebar_fill_color"`
+		ProfileTextColor               string      `json:"profile_text_color"`
+		ProfileUseBackgroundImage      bool        `json:"profile_use_background_image"`
+		HasExtendedProfile             bool        `json:"has_extended_profile"`
+		DefaultProfile                 bool        `json:"default_profile"`
+		DefaultProfileImage            bool        `json:"default_profile_image"`
+		Following                      bool        `json:"following"`
+		FollowRequestSent              bool        `json:"follow_request_sent"`
+		Notifications                  bool        `json:"notifications"`
+		TranslatorType                 string      `json:"translator_type"`
+	} `json:"user"`
+	Geo               interface{} `json:"geo"`
+	Coordinates       interface{} `json:"coordinates"`
+	Place             interface{} `json:"place"`
+	Contributors      interface{} `json:"contributors"`
+	IsQuoteStatus     bool        `json:"is_quote_status"`
+	RetweetCount      int         `json:"retweet_count"`
+	FavoriteCount     int         `json:"favorite_count"`
+	Favorited         bool        `json:"favorited"`
+	Retweeted         bool        `json:"retweeted"`
+	PossiblySensitive bool        `json:"possibly_sensitive"`
+	Lang              string      `json:"lang"`
 }
