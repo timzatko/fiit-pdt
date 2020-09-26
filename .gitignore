@@ -3,3 +3,6 @@
 
 # Data
 data/*.jsonl.gz
+
+# OS
+.DS_Store
