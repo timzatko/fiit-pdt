@@ -30,7 +30,7 @@ func init() {
 	}, func(db migrations.DB) error {
 		fmt.Println("dropping table accounts...")
 		_, err := db.Exec(`
-			ALTER TABLE tweets DROP FOREIGN KEY fk_accounts_tweets;
+			ALTER TABLE tweets DROP CONSTRAINT fk_accounts_tweets;
 			DROP TABLE accounts;
 		`)
 		return err
