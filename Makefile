@@ -10,4 +10,4 @@ lint-fix:
 	goimports --local github.com/timzatko/fiit-pdt -w .
 
 populate-db:
-	go run cmd/populatedb/populatedb.go
+	go run cmd/populatedb/main.go
