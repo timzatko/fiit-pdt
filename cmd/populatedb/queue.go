@@ -43,13 +43,10 @@ func (q *Queue) send() {
 	q.Accounts = []model.Account{}
 
 	go func() {
-		// TODO: common mutex for all files running in parallel
-		q.sync.AccountsMutex.Lock()
-		_, err := q.db.Model(&a).OnConflict("DO NOTHING").Insert()
-		q.sync.AccountsMutex.Unlock()
-
+		// NOTE: insert order is IMPORTANT (since there are relations between tables, some entities must be inserted first!)
+		// inset to accounts table
+		err := q.insert(a)
 		if err != nil {
-			q.sync.AccountsMutex.Unlock()
 			log.Panicf("error while inserting: %s", err)
 		}
 
@@ -75,4 +72,12 @@ func (q *Queue) add(rt RawTweet) {
 	}
 
 	q.Accounts = append(q.Accounts, acc)
+}
+
+func (q *Queue) insert(entity interface{}) error {
+	q.sync.AccountsMutex.Lock()
+	_, err := q.db.Model(&entity).OnConflict("DO NOTHING").Insert()
+	q.sync.AccountsMutex.Unlock()
+
+	return err
 }
