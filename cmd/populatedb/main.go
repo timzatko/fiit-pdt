@@ -3,6 +3,7 @@ package main
 import (
 	"bufio"
 	"compress/gzip"
+	"context"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
@@ -10,8 +11,9 @@ import (
 	"os"
 	"path"
 	"regexp"
-	"sync"
+	"runtime"
 
+	"golang.org/x/sync/semaphore"
 	"gorm.io/gorm"
 
 	"github.com/timzatko/fiit-pdt/cmd/populatedb/utils"
@@ -57,23 +59,34 @@ func getFiles(dataDir string) []string {
 }
 
 func readFiles(db *gorm.DB, dataDir string, files []string) {
-	var wg sync.WaitGroup
-	var synchronizer utils.Synchronizer
+	var (
+		synchronizer utils.Synchronizer
+		maxWorkers   = runtime.GOMAXPROCS(0)
+		sem          = semaphore.NewWeighted(int64(maxWorkers))
+	)
+
+	ctx := context.TODO()
 
 	for _, file := range files {
-		wg.Add(1)
+		if err := sem.Acquire(ctx, 1); err != nil {
+			log.Printf("failed to acquire semaphore: %v", err)
+			break
+		}
+
 		// read file and insert to database in goroutine
-		go readFile(db, &wg, &synchronizer, dataDir, file)
+		go readFile(db, sem, &synchronizer, dataDir, file)
 		// TODO: remove this to go through all files
 		// break
 	}
 
-	// wait until all files are read
-	wg.Wait()
+	// Acquire all of the tokens to wait for any remaining workers to finish.
+	if err := sem.Acquire(ctx, int64(maxWorkers)); err != nil {
+		log.Printf("failed to acquire semaphore: %v", err)
+	}
 }
 
-func readFile(db *gorm.DB, wg *sync.WaitGroup, synchronizer *utils.Synchronizer, dataDir string, fileName string) {
-	defer wg.Done()
+func readFile(db *gorm.DB, sem *semaphore.Weighted, synchronizer *utils.Synchronizer, dataDir string, fileName string) {
+	defer sem.Release(1)
 
 	log.Printf("reading file %s...", fileName)
 
