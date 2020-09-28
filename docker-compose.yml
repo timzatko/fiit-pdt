@@ -14,11 +14,12 @@ services:
     volumes:
       - postgis-data:/var/lib/postgresql
     environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: 123
-      POSTGRES_DB: tweets
+      POSTGRES_DB: "${PDT_DATABASE_DB}"
+      POSTGRES_USER: "${PDT_DATABASE_USER}"
+      POSTGRES_PASSWORD: "${PDT_DATABASE_PASSWORD}"
     ports:
       - "5432:5432" # expose postgresql ports to local machine and other services
+    command: "-c log_statement=none" # "-c log_statement=all" # use this for debugging
 
   adminer:
     image: adminer

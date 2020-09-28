@@ -1,4 +1,4 @@
-package main
+package utils
 
 // RawTweet interface generated with https://mholt.github.io/json-to-go/
 type RawTweet struct {
@@ -9,10 +9,19 @@ type RawTweet struct {
 	Truncated        bool   `json:"truncated"`
 	DisplayTextRange []int  `json:"display_text_range"`
 	Entities         struct {
-		Hashtags     []interface{} `json:"hashtags"`
+		Hashtags []struct {
+			Text    string `json:"text"`
+			Indices []int  `json:"indices"`
+		} `json:"hashtags"`
 		Symbols      []interface{} `json:"symbols"`
-		UserMentions []interface{} `json:"user_mentions"`
-		Urls         []struct {
+		UserMentions []struct {
+			ScreenName string `json:"screen_name"`
+			Name       string `json:"name"`
+			ID         int64  `json:"id"`
+			IDStr      string `json:"id_str"`
+			Indices    []int  `json:"indices"`
+		} `json:"user_mentions"`
+		Urls []struct {
 			URL         string `json:"url"`
 			ExpandedURL string `json:"expanded_url"`
 			DisplayURL  string `json:"display_url"`
@@ -88,15 +97,43 @@ type RawTweet struct {
 		Notifications                  bool        `json:"notifications"`
 		TranslatorType                 string      `json:"translator_type"`
 	} `json:"user"`
-	Geo               interface{} `json:"geo"`
-	Coordinates       interface{} `json:"coordinates"`
-	Place             interface{} `json:"place"`
-	Contributors      interface{} `json:"contributors"`
-	IsQuoteStatus     bool        `json:"is_quote_status"`
-	RetweetCount      int         `json:"retweet_count"`
-	FavoriteCount     int         `json:"favorite_count"`
-	Favorited         bool        `json:"favorited"`
-	Retweeted         bool        `json:"retweeted"`
-	PossiblySensitive bool        `json:"possibly_sensitive"`
-	Lang              string      `json:"lang"`
+	Geo               *Geo         `json:"geo"`
+	Coordinates       *Coordinates `json:"coordinates"`
+	Place             *Place       `json:"place"`
+	Contributors      interface{}  `json:"contributors"`
+	IsQuoteStatus     bool         `json:"is_quote_status"`
+	FavoriteCount     int64        `json:"favorite_count"`
+	Favorited         bool         `json:"favorited"`
+	Retweeted         bool         `json:"retweeted"`
+	RetweetedStatus   *RawTweet    `json:"retweeted_status"`
+	RetweetCount      int64        `json:"retweet_count"`
+	PossiblySensitive bool         `json:"possibly_sensitive"`
+	Lang              string       `json:"lang"`
+}
+
+type Place struct {
+	ID              string        `json:"id"`
+	URL             string        `json:"url"`
+	PlaceType       string        `json:"place_type"`
+	Name            string        `json:"name"`
+	FullName        string        `json:"full_name"`
+	CountryCode     string        `json:"country_code"`
+	Country         string        `json:"country"`
+	ContainedWithin []interface{} `json:"contained_within"`
+	BoundingBox     struct {
+		Type        string        `json:"type"`
+		Coordinates [][][]float64 `json:"coordinates"`
+	} `json:"bounding_box"`
+	Attributes struct {
+	} `json:"attributes"`
+}
+
+type Geo struct {
+	Type        string    `json:"type"`
+	Coordinates []float64 `json:"coordinates"`
+}
+
+type Coordinates struct {
+	Type        string    `json:"type"`
+	Coordinates []float64 `json:"coordinates"`
 }

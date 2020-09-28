@@ -12,20 +12,19 @@ import (
 	"regexp"
 	"sync"
 
-	"github.com/go-pg/pg"
+	"gorm.io/gorm"
 
+	"github.com/timzatko/fiit-pdt/cmd/populatedb/utils"
 	"github.com/timzatko/fiit-pdt/internal/database"
 )
 
-// Synchronizer is used to sync inserting entities of different types
-// between different files. So at one time, only to one entity is being written.
-type Synchronizer struct {
-	AccountsMutex sync.Mutex
-}
-
 func main() {
 	// connect to the database
-	db := database.Connect()
+	db, err := database.Connect()
+	if err != nil {
+		log.Fatalf("error while openning database connection: %s", err)
+	}
+	// close the database after everything is done
 	defer database.Close(db)
 
 	// get files in the data directory
@@ -57,21 +56,23 @@ func getFiles(dataDir string) []string {
 	return fileNames
 }
 
-func readFiles(db *pg.DB, dataDir string, files []string) {
+func readFiles(db *gorm.DB, dataDir string, files []string) {
 	var wg sync.WaitGroup
-	var synchronizer Synchronizer
+	var synchronizer utils.Synchronizer
 
 	for _, file := range files {
 		wg.Add(1)
 		// read file and insert to database in goroutine
 		go readFile(db, &wg, &synchronizer, dataDir, file)
+		// TODO: remove this to go through all files
+		// break
 	}
 
 	// wait until all files are read
 	wg.Wait()
 }
 
-func readFile(db *pg.DB, wg *sync.WaitGroup, synchronizer *Synchronizer, dataDir string, fileName string) {
+func readFile(db *gorm.DB, wg *sync.WaitGroup, synchronizer *utils.Synchronizer, dataDir string, fileName string) {
 	defer wg.Done()
 
 	log.Printf("reading file %s...", fileName)
@@ -107,7 +108,7 @@ func readFile(db *pg.DB, wg *sync.WaitGroup, synchronizer *Synchronizer, dataDir
 	}()
 
 	// create a new queue for entities
-	q := NewQueue(db, synchronizer)
+	q := utils.NewQueue(db, synchronizer)
 
 	s := bufio.NewScanner(gz)
 	for s.Scan() {
@@ -121,21 +122,21 @@ func readFile(db *pg.DB, wg *sync.WaitGroup, synchronizer *Synchronizer, dataDir
 		}
 
 		// add raw tweet to queue, so it will be inserted later in bulk
-		q.add(rawTweet)
+		q.Enqueue(&rawTweet)
 
 		// if queue is full, flush it and insert entities to the database
-		if q.isFull() {
-			q.send()
+		if q.IsFull() {
+			q.Flush()
 		}
 	}
 
 	// if queue is not empty, flush it and insert remaining entities to the database
-	if !q.isEmpty() {
-		q.send()
+	if !q.IsEmpty() {
+		q.Flush()
 	}
 
 	// wait until all entities in queue are inserted to database
-	q.wg.Wait()
+	q.Wg.Wait()
 
 	if err := s.Err(); err != nil {
 		log.Panic(err)
@@ -144,8 +145,8 @@ func readFile(db *pg.DB, wg *sync.WaitGroup, synchronizer *Synchronizer, dataDir
 	log.Printf("done %s...", fileName)
 }
 
-func parseJson(j []byte) (RawTweet, error) {
-	var rt RawTweet
+func parseJson(j []byte) (utils.RawTweet, error) {
+	var rt utils.RawTweet
 	err := json.Unmarshal(j, &rt)
 	return rt, err
 }

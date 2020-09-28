@@ -1,3 +1,6 @@
+include .env
+export
+
 help:
 	@echo "lint                      to run golangci-lint"
 	@echo "lint-fix                  to fix lint errors"
@@ -9,5 +12,11 @@ lint:
 lint-fix:
 	goimports --local github.com/timzatko/fiit-pdt -w .
 
-populate-db:
+db-seed:
 	go run cmd/populatedb/main.go
+
+db-migrate-up:
+	migrate -database "postgres://${PDT_DATABASE_USER}:${PDT_DATABASE_PASSWORD}@localhost:5432/${PDT_DATABASE_DB}?sslmode=disable" -path db/migrations up
+
+db-migrate-drop:
+	migrate -database "postgres://${PDT_DATABASE_USER}:${PDT_DATABASE_PASSWORD}@localhost:5432/${PDT_DATABASE_DB}?sslmode=disable" -path db/migrations drop
