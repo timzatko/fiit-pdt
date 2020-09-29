@@ -144,7 +144,6 @@ func (q *Queue) process(rts *[10000]*RawTweet, batchId int, size int) {
 
 	// TWEETS
 	q.sync.TweetsMutex.Lock()
-
 	var tweets []map[string]interface{}
 
 	for i := 0; i < size; i++ {
@@ -157,7 +156,7 @@ func (q *Queue) process(rts *[10000]*RawTweet, batchId int, size int) {
 
 		var cid interface{} = nil
 		if rt.Place != nil && len(rt.Place.CountryCode) > 0 {
-			cid = clause.Expr{SQL: "(SELECT batchId FROM countries WHERE name=? LIMIT 1)", Vars: []interface{}{rt.Place.Country}}
+			cid = clause.Expr{SQL: "(SELECT id FROM countries WHERE name=? LIMIT 1)", Vars: []interface{}{rt.Place.Country}}
 		}
 
 		var pid interface{} = nil
@@ -191,7 +190,7 @@ func (q *Queue) process(rts *[10000]*RawTweet, batchId int, size int) {
 
 		for _, h := range rt.Entities.Hashtags {
 			ths = append(ths, map[string]interface{}{
-				"HashtagId": clause.Expr{SQL: "(SELECT batchId FROM hashtags WHERE value=? LIMIT 1)", Vars: []interface{}{h.Text}},
+				"HashtagId": clause.Expr{SQL: "(SELECT id FROM hashtags WHERE value=? LIMIT 1)", Vars: []interface{}{h.Text}},
 				"TweetId":   rt.IDStr,
 			})
 		}
