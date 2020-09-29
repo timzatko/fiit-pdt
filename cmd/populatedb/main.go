@@ -62,7 +62,7 @@ func readFiles(db *gorm.DB, dataDir string, files []string) {
 	synchronizer := utils.NewSynchronizer(ctx, 16)
 
 	for i, file := range files {
-		readFile(db, &synchronizer, dataDir, file, i, len(files))
+		readFile(db, &synchronizer, dataDir, file, i+1, len(files))
 	}
 
 	synchronizer.Wait()

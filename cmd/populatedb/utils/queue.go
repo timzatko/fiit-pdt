@@ -16,7 +16,7 @@ import (
 type Queue struct {
 	// when using higher values than 5000 (eg. 10000)
 	// the tweets won't be imported
-	rts     [5000]*RawTweet
+	rts     [2500]*RawTweet
 	size    int
 	db      *gorm.DB
 	sync    *Synchronizer
@@ -68,7 +68,7 @@ func (q *Queue) Enqueue(rt *RawTweet) {
 	q.size += 1
 }
 
-func (q *Queue) process(rts *[5000]*RawTweet, batchId int, size int) {
+func (q *Queue) process(rts *[2500]*RawTweet, batchId int, size int) {
 	log.Printf("processing batch #%d with %d tweets...", batchId, size)
 
 	defer q.sync.Release()
@@ -76,6 +76,7 @@ func (q *Queue) process(rts *[5000]*RawTweet, batchId int, size int) {
 
 	// ACCOUNTS
 	var accs []model.Account
+
 	for i := 0; i < size; i++ {
 		rt := rts[i]
 
@@ -100,7 +101,7 @@ func (q *Queue) process(rts *[5000]*RawTweet, batchId int, size int) {
 	}
 	// insert to accounts table
 	if len(accs) > 0 {
-		log.Printf("batch #%d inserting accounts...", batchId)
+		log.Printf("batch #%d inserting %d accounts...", batchId, len(accs))
 		q.insert(&accs, &q.sync.AccountsMutex)
 	}
 
@@ -119,10 +120,10 @@ func (q *Queue) process(rts *[5000]*RawTweet, batchId int, size int) {
 
 	// insert to hashtags table
 	if len(hts) > 0 {
-		log.Printf("batch #%d inserting hashtags...", batchId)
+		log.Printf("batch #%d inserting %d hashtags...", batchId, len(hts))
 		res := q.insert(&hts, &q.sync.HashtagsMutex)
 		if res.Error != nil {
-			log.Panicf("error: batch #%d unable to insert hashtags", batchId)
+			log.Panicf("error: batch #%d unable to insert hashtags: %s", batchId, res.Error)
 		}
 	}
 
@@ -143,10 +144,10 @@ func (q *Queue) process(rts *[5000]*RawTweet, batchId int, size int) {
 
 	// insert to countries database
 	if len(countries) > 0 {
-		log.Printf("batch #%d inserting countries...", batchId)
+		log.Printf("batch #%d inserting %d countries...", batchId, len(countries))
 		res := q.insert(&countries, &q.sync.CountriesMutex)
 		if res.Error != nil {
-			log.Panicf("error: batch #%d unable to insert countries", batchId)
+			log.Panicf("error: batch #%d unable to insert countries: %s", batchId, res.Error)
 		}
 	}
 
@@ -186,11 +187,11 @@ func (q *Queue) process(rts *[5000]*RawTweet, batchId int, size int) {
 	}
 
 	// insert to tweets table
-	log.Printf("batch #%d inserting tweets...", batchId)
+	log.Printf("batch #%d inserting %d tweets...", batchId, len(tweets))
 	res := q.db.Model(model.Tweet{}).Clauses(clause.OnConflict{DoNothing: true}).Create(tweets)
 	q.sync.TweetsMutex.Unlock()
 	if res.Error != nil {
-		log.Panicf("error: batch #%d unable to insert tweets", batchId)
+		log.Panicf("error: batch #%d unable to insert tweets: %s", batchId, res.Error)
 	}
 
 	//// TWEET HASHTAGS
@@ -209,11 +210,11 @@ func (q *Queue) process(rts *[5000]*RawTweet, batchId int, size int) {
 
 	if len(ths) > 0 {
 		q.sync.TweetHashtagsMutex.Lock()
-		log.Printf("batch #%d inserting tweet hashtags...", batchId)
+		log.Printf("batch #%d inserting %d tweet hashtags...", batchId, len(ths))
 		res := q.db.Model(model.TweetHashtag{}).Clauses(clause.OnConflict{DoNothing: true}).Create(ths)
 		q.sync.TweetHashtagsMutex.Unlock()
 		if res.Error != nil {
-			log.Panicf("error: batch #%d unable to insert tweet hashtags", batchId)
+			log.Panicf("error: batch #%d unable to insert tweet hashtags: %s", batchId, res.Error)
 		}
 	}
 
@@ -233,10 +234,10 @@ func (q *Queue) process(rts *[5000]*RawTweet, batchId int, size int) {
 
 	// insert to tweet mentions table
 	if len(tms) > 0 {
-		log.Printf("batch #%d inserting tweet mentions...", batchId)
+		log.Printf("batch #%d inserting %d tweet mentions...", batchId, len(tms))
 		res := q.insert(&tms, &q.sync.TweetMentionsMutex)
 		if res.Error != nil {
-			log.Panicf("error: batch #%d unable to insert tweet mentions", batchId)
+			log.Panicf("error: batch #%d unable to insert tweet mentions: %s", batchId, res.Error)
 		}
 	}
 }
@@ -251,11 +252,11 @@ func (q *Queue) insert(entities interface{}, mutex *sync.Mutex) *gorm.DB {
 }
 
 // clear the queue and return the old queue
-func (q *Queue) clear() ([5000]*RawTweet, int) {
+func (q *Queue) clear() ([2500]*RawTweet, int) {
 	rts := q.rts
 	size := q.size
 
-	q.rts = [5000]*RawTweet{}
+	q.rts = [2500]*RawTweet{}
 	q.size = 0
 
 	return rts, size
