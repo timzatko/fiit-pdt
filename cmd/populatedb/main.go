@@ -11,13 +11,12 @@ import (
 	"os"
 	"path"
 	"regexp"
-	"runtime"
 
-	"golang.org/x/sync/semaphore"
 	"gorm.io/gorm"
 
 	"github.com/timzatko/fiit-pdt/cmd/populatedb/utils"
 	"github.com/timzatko/fiit-pdt/internal/database"
+	"github.com/timzatko/fiit-pdt/internal/timer"
 )
 
 func main() {
@@ -59,34 +58,19 @@ func getFiles(dataDir string) []string {
 }
 
 func readFiles(db *gorm.DB, dataDir string, files []string) {
-	var (
-		synchronizer utils.Synchronizer
-		maxWorkers   = runtime.GOMAXPROCS(0)
-		sem          = semaphore.NewWeighted(int64(maxWorkers))
-	)
-
 	ctx := context.TODO()
+	synchronizer := utils.NewSynchronizer(ctx, 16)
 
-	for _, file := range files {
-		if err := sem.Acquire(ctx, 1); err != nil {
-			log.Printf("failed to acquire semaphore: %v", err)
-			break
-		}
-
-		// read file and insert to database in goroutine
-		go readFile(db, sem, &synchronizer, dataDir, file)
+	for i, file := range files {
+		readFile(db, &synchronizer, dataDir, file, i, len(files))
 	}
 
-	// Acquire all of the tokens to wait for any remaining workers to finish.
-	if err := sem.Acquire(ctx, int64(maxWorkers)); err != nil {
-		log.Printf("failed to acquire semaphore: %v", err)
-	}
+	synchronizer.Wait()
 }
 
-func readFile(db *gorm.DB, sem *semaphore.Weighted, synchronizer *utils.Synchronizer, dataDir string, fileName string) {
-	defer sem.Release(1)
-
-	log.Printf("reading file %s...", fileName)
+func readFile(db *gorm.DB, synchronizer *utils.Synchronizer, dataDir string, fileName string, i int, c int) {
+	log.Printf("reading file %s (%d/%d)...", fileName, i, c)
+	defer timer.Duration(timer.Track(fmt.Sprintf("done reading %s (%d/%d)...", fileName, i, c)))
 
 	var err error
 	file, err := os.Open(path.Join(dataDir, fileName))
@@ -146,14 +130,9 @@ func readFile(db *gorm.DB, sem *semaphore.Weighted, synchronizer *utils.Synchron
 		q.Flush()
 	}
 
-	// wait until all entities in queue are inserted to database
-	q.Wg.Wait()
-
 	if err := s.Err(); err != nil {
 		log.Panic(err)
 	}
-
-	log.Printf("done %s...", fileName)
 }
 
 func parseJson(j []byte) (utils.RawTweet, error) {

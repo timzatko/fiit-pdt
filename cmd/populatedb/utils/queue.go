@@ -1,6 +1,7 @@
 package utils
 
 import (
+	"fmt"
 	"log"
 	"sync"
 	"time"
@@ -9,20 +10,22 @@ import (
 	"gorm.io/gorm/clause"
 
 	"github.com/timzatko/fiit-pdt/internal/app/model"
+	"github.com/timzatko/fiit-pdt/internal/timer"
 )
 
 type Queue struct {
-	rts  [2500]*RawTweet
-	size int
-	Wg   sync.WaitGroup
-	db   *gorm.DB
-	sync *Synchronizer
+	rts     [10000]*RawTweet
+	size    int
+	db      *gorm.DB
+	sync    *Synchronizer
+	counter int
 }
 
 func NewQueue(db *gorm.DB, synchronizer *Synchronizer) Queue {
 	return Queue{
-		db:   db,
-		sync: synchronizer,
+		db:      db,
+		sync:    synchronizer,
+		counter: 0,
 	}
 }
 
@@ -39,10 +42,13 @@ func (q *Queue) Flush() {
 		return
 	}
 
-	q.Wg.Add(1)
+	if err := q.sync.Acquire(); err != nil {
+		log.Panicf("failed to acquire semaphore: %v", err)
+	}
 
+	q.counter += 1
 	rts, size := q.clear()
-	go q.process(&rts, size)
+	go q.process(&rts, q.counter, size)
 }
 
 // Enqueue an entity to its own queue
@@ -60,8 +66,11 @@ func (q *Queue) Enqueue(rt *RawTweet) {
 	q.size += 1
 }
 
-func (q *Queue) process(rts *[2500]*RawTweet, size int) {
-	defer q.Wg.Done()
+func (q *Queue) process(rts *[10000]*RawTweet, batchId int, size int) {
+	log.Printf("processing batch #%d with %d tweets...", batchId, size)
+
+	defer q.sync.Release()
+	defer timer.Duration(timer.Track(fmt.Sprintf("batch %d processed!", batchId)))
 
 	// ACCOUNTS
 	var accs []model.Account
@@ -89,6 +98,7 @@ func (q *Queue) process(rts *[2500]*RawTweet, size int) {
 	}
 	// insert to accounts table
 	if len(accs) > 0 {
+		log.Printf("batch #%d inserting accounts...", batchId)
 		q.insert(&accs, &q.sync.AccountsMutex)
 	}
 
@@ -107,6 +117,7 @@ func (q *Queue) process(rts *[2500]*RawTweet, size int) {
 
 	// insert to hashtags table
 	if len(hts) > 0 {
+		log.Printf("batch #%d inserting hashtags...", batchId)
 		q.insert(&hts, &q.sync.HashtagsMutex)
 	}
 
@@ -127,12 +138,12 @@ func (q *Queue) process(rts *[2500]*RawTweet, size int) {
 
 	// insert to countries database
 	if len(countries) > 0 {
+		log.Printf("batch #%d inserting countries...", batchId)
 		q.insert(&countries, &q.sync.CountriesMutex)
 	}
 
 	// TWEETS
 	q.sync.TweetsMutex.Lock()
-	q.sync.CountriesMutex.Lock() // lock also countries, since we are selecting country_id
 
 	var tweets []map[string]interface{}
 
@@ -146,7 +157,7 @@ func (q *Queue) process(rts *[2500]*RawTweet, size int) {
 
 		var cid interface{} = nil
 		if rt.Place != nil && len(rt.Place.CountryCode) > 0 {
-			cid = clause.Expr{SQL: "(SELECT id FROM countries WHERE name=? LIMIT 1)", Vars: []interface{}{rt.Place.Country}}
+			cid = clause.Expr{SQL: "(SELECT batchId FROM countries WHERE name=? LIMIT 1)", Vars: []interface{}{rt.Place.Country}}
 		}
 
 		var pid interface{} = nil
@@ -168,8 +179,8 @@ func (q *Queue) process(rts *[2500]*RawTweet, size int) {
 	}
 
 	// insert to tweets hashtags table
+	log.Printf("batch #%d inserting tweets...", batchId)
 	q.db.Model(model.Tweet{}).Clauses(clause.OnConflict{DoNothing: true}).Create(tweets)
-	q.sync.CountriesMutex.Unlock()
 	q.sync.TweetsMutex.Unlock()
 
 	// TWEET HASHTAGS
@@ -180,7 +191,7 @@ func (q *Queue) process(rts *[2500]*RawTweet, size int) {
 
 		for _, h := range rt.Entities.Hashtags {
 			ths = append(ths, map[string]interface{}{
-				"HashtagId": clause.Expr{SQL: "(SELECT id FROM hashtags WHERE value=? LIMIT 1)", Vars: []interface{}{h.Text}},
+				"HashtagId": clause.Expr{SQL: "(SELECT batchId FROM hashtags WHERE value=? LIMIT 1)", Vars: []interface{}{h.Text}},
 				"TweetId":   rt.IDStr,
 			})
 		}
@@ -188,6 +199,7 @@ func (q *Queue) process(rts *[2500]*RawTweet, size int) {
 
 	if len(ths) > 0 {
 		q.sync.TweetHashtagsMutex.Lock()
+		log.Printf("batch #%d inserting tweet hashtags...", batchId)
 		q.db.Model(model.TweetHashtag{}).Clauses(clause.OnConflict{DoNothing: true}).Create(ths)
 		q.sync.TweetHashtagsMutex.Unlock()
 	}
@@ -208,6 +220,7 @@ func (q *Queue) process(rts *[2500]*RawTweet, size int) {
 
 	// insert to tweet mentions table
 	if len(tms) > 0 {
+		log.Printf("batch #%d inserting tweet mentions...", batchId)
 		q.insert(&tms, &q.sync.TweetMentionsMutex)
 	}
 }
@@ -222,11 +235,11 @@ func (q *Queue) insert(entities interface{}, mutex *sync.Mutex) *gorm.DB {
 }
 
 // clear the queue and return the old queue
-func (q *Queue) clear() ([2500]*RawTweet, int) {
+func (q *Queue) clear() ([10000]*RawTweet, int) {
 	rts := q.rts
 	size := q.size
 
-	q.rts = [2500]*RawTweet{}
+	q.rts = [10000]*RawTweet{}
 	q.size = 0
 
 	return rts, size
