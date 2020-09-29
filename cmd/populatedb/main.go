@@ -75,8 +75,6 @@ func readFiles(db *gorm.DB, dataDir string, files []string) {
 
 		// read file and insert to database in goroutine
 		go readFile(db, sem, &synchronizer, dataDir, file)
-		// TODO: remove this to go through all files
-		// break
 	}
 
 	// Acquire all of the tokens to wait for any remaining workers to finish.

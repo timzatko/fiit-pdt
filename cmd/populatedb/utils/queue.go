@@ -1,9 +1,7 @@
 package utils
 
 import (
-	"fmt"
 	"log"
-	"strings"
 	"sync"
 	"time"
 
@@ -14,7 +12,8 @@ import (
 )
 
 type Queue struct {
-	rts  []*RawTweet
+	rts  [2500]*RawTweet
+	size int
 	Wg   sync.WaitGroup
 	db   *gorm.DB
 	sync *Synchronizer
@@ -28,11 +27,11 @@ func NewQueue(db *gorm.DB, synchronizer *Synchronizer) Queue {
 }
 
 func (q *Queue) IsFull() bool {
-	return len(q.rts) >= 100
+	return len(q.rts) == q.size
 }
 
 func (q *Queue) IsEmpty() bool {
-	return len(q.rts) == 0
+	return q.size == 0
 }
 
 func (q *Queue) Flush() {
@@ -42,8 +41,8 @@ func (q *Queue) Flush() {
 
 	q.Wg.Add(1)
 
-	rts := q.clear()
-	go q.process(rts)
+	rts, size := q.clear()
+	go q.process(&rts, size)
 }
 
 // Enqueue an entity to its own queue
@@ -53,15 +52,22 @@ func (q *Queue) Enqueue(rt *RawTweet) {
 		q.Enqueue(rt.RetweetedStatus)
 	}
 
-	q.rts = append(q.rts, rt)
+	if q.IsFull() {
+		q.Flush()
+	}
+
+	q.rts[q.size] = rt
+	q.size += 1
 }
 
-func (q *Queue) process(rts []*RawTweet) {
+func (q *Queue) process(rts *[2500]*RawTweet, size int) {
 	defer q.Wg.Done()
 
 	// ACCOUNTS
 	var accs []model.Account
-	for _, rt := range rts {
+	for i := 0; i < size; i++ {
+		rt := rts[i]
+
 		accs = append(accs, model.Account{
 			Id:             rt.User.ID,
 			ScreenName:     rt.User.ScreenName,
@@ -88,7 +94,9 @@ func (q *Queue) process(rts []*RawTweet) {
 
 	// HASHTAGS
 	var hts []model.Hashtag
-	for _, rt := range rts {
+	for i := 0; i < size; i++ {
+		rt := rts[i]
+
 		for _, rawHashtag := range rt.Entities.Hashtags {
 			ht := model.Hashtag{
 				Value: rawHashtag.Text,
@@ -104,7 +112,9 @@ func (q *Queue) process(rts []*RawTweet) {
 
 	// COUNTRIES
 	var countries []model.Country
-	for _, rt := range rts {
+	for i := 0; i < size; i++ {
+		rt := rts[i]
+
 		if rt.Place != nil && len(rt.Place.CountryCode) > 0 {
 			c := model.Country{
 				Code: rt.Place.CountryCode,
@@ -122,67 +132,71 @@ func (q *Queue) process(rts []*RawTweet) {
 
 	// TWEETS
 	q.sync.TweetsMutex.Lock()
-	// lock also countries, since we are selecting country_id
-	q.sync.CountriesMutex.Lock()
+	q.sync.CountriesMutex.Lock() // lock also countries, since we are selecting country_id
 
-	var queries []string
-	var vars []interface{}
+	var tweets []map[string]interface{}
 
-	for _, rt := range rts {
-		var parentId *string = nil
-		if rt.RetweetedStatus != nil {
-			parentId = &rt.RetweetedStatus.IDStr
-		}
+	for i := 0; i < size; i++ {
+		rt := rts[i]
 
-		var countryId = "NULL"
-		if rt.Place != nil && len(rt.Place.CountryCode) > 0 {
-			countryId = fmt.Sprintf("(SELECT id FROM countries WHERE name='%s' LIMIT 1)", rt.Place.Country)
-		}
-
-		var location = "NULL"
+		var loc interface{} = nil
 		if rt.Geo != nil {
-			location = fmt.Sprintf("ST_SetSRID(ST_MakePoint(%f, %f), 4326)", rt.Geo.Coordinates[0], rt.Geo.Coordinates[1])
+			loc = clause.Expr{SQL: "ST_SetSRID(ST_MakePoint(%f, %f), 4326)", Vars: []interface{}{rt.Geo.Coordinates[0], rt.Geo.Coordinates[1]}}
 		}
 
-		happenedAt := toTime(rt).Unix()
+		var cid interface{} = nil
+		if rt.Place != nil && len(rt.Place.CountryCode) > 0 {
+			cid = clause.Expr{SQL: "(SELECT id FROM countries WHERE name=? LIMIT 1)", Vars: []interface{}{rt.Place.Country}}
+		}
 
-		// SQL Injection, NOT COOL!
-		q := fmt.Sprintf("(?, ?, %s, ?, ?, to_timestamp(?), ?, %s, ?)", location, countryId)
+		var pid interface{} = nil
+		if rt.RetweetedStatus != nil {
+			pid = rt.RetweetedStatus.IDStr
+		}
 
-		// This is quite hacky, but this is the best way to use sub queries in insert query
-		queries = append(queries, q)
-		vars = append(vars, []interface{}{rt.IDStr, rt.FullText, rt.RetweetCount, rt.FavoriteCount, happenedAt, rt.User.IDStr, parentId}...)
+		tweets = append(tweets, map[string]interface{}{
+			"Id":            rt.IDStr,
+			"Content":       rt.FullText,
+			"RetweetCount":  rt.RetweetCount,
+			"FavoriteCount": rt.FavoriteCount,
+			"AuthorId":      rt.User.IDStr,
+			"HappenedAt":    clause.Expr{SQL: "to_timestamp(?)", Vars: []interface{}{toTime(rt).Unix()}},
+			"CountryId":     cid,
+			"Location":      loc,
+			"ParentId":      pid,
+		})
 	}
 
-	query := fmt.Sprintf("INSERT INTO tweets (id, content, location, retweet_count, favorite_count, happened_at, author_id, country_id, parent_id) VALUES %s ON CONFLICT DO NOTHING;", strings.Join(queries, ", "))
-	q.db.Exec(query, vars...)
-
+	// insert to tweets hashtags table
+	q.db.Model(model.Tweet{}).Clauses(clause.OnConflict{DoNothing: true}).Create(tweets)
 	q.sync.CountriesMutex.Unlock()
 	q.sync.TweetsMutex.Unlock()
 
 	// TWEET HASHTAGS
-	q.sync.TweetHashtagsMutex.Lock()
+	var ths []map[string]interface{}
 
-	queries = []string{}
-	vars = []interface{}{}
+	for i := 0; i < size; i++ {
+		rt := rts[i]
 
-	for _, rt := range rts {
 		for _, h := range rt.Entities.Hashtags {
-			queries = append(queries, "((SELECT id FROM hashtags WHERE value=? LIMIT 1), ?)")
-			vars = append(vars, []interface{}{h.Text, rt.IDStr}...)
+			ths = append(ths, map[string]interface{}{
+				"HashtagId": clause.Expr{SQL: "(SELECT id FROM hashtags WHERE value=? LIMIT 1)", Vars: []interface{}{h.Text}},
+				"TweetId":   rt.IDStr,
+			})
 		}
 	}
 
-	query = fmt.Sprintf("INSERT INTO tweet_hashtags (hashtag_id, tweet_id) VALUES %s ON CONFLICT DO NOTHING;", strings.Join(queries, ", "))
-	// insert to tweet hashtags table
-	q.db.Exec(query, vars...)
-
-	q.sync.TweetHashtagsMutex.Unlock()
+	if len(ths) > 0 {
+		q.sync.TweetHashtagsMutex.Lock()
+		q.db.Model(model.TweetHashtag{}).Clauses(clause.OnConflict{DoNothing: true}).Create(ths)
+		q.sync.TweetHashtagsMutex.Unlock()
+	}
 
 	// TWEET MENTIONS
-
 	var tms []model.TweetMention
-	for _, rt := range rts {
+	for i := 0; i < size; i++ {
+		rt := rts[i]
+
 		for _, um := range rt.Entities.UserMentions {
 			tm := model.TweetMention{
 				TweetId:   rt.IDStr,
@@ -208,11 +222,14 @@ func (q *Queue) insert(entities interface{}, mutex *sync.Mutex) *gorm.DB {
 }
 
 // clear the queue and return the old queue
-func (q *Queue) clear() []*RawTweet {
+func (q *Queue) clear() ([2500]*RawTweet, int) {
 	rts := q.rts
-	q.rts = []*RawTweet{}
+	size := q.size
 
-	return rts
+	q.rts = [2500]*RawTweet{}
+	q.size = 0
+
+	return rts, size
 }
 
 func toTime(rt *RawTweet) time.Time {
