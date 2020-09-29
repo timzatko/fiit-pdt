@@ -16,7 +16,7 @@ import (
 type Queue struct {
 	// when using higher values than 5000 (eg. 10000)
 	// the tweets won't be imported
-	rts     [2500]*RawTweet
+	rts     [500]*RawTweet
 	size    int
 	db      *gorm.DB
 	sync    *Synchronizer
@@ -68,7 +68,7 @@ func (q *Queue) Enqueue(rt *RawTweet) {
 	q.size += 1
 }
 
-func (q *Queue) process(rts *[2500]*RawTweet, batchId int, size int) {
+func (q *Queue) process(rts *[500]*RawTweet, batchId int, size int) {
 	log.Printf("processing batch #%d with %d tweets...", batchId, size)
 
 	defer q.sync.Release()
@@ -252,11 +252,11 @@ func (q *Queue) insert(entities interface{}, mutex *sync.Mutex) *gorm.DB {
 }
 
 // clear the queue and return the old queue
-func (q *Queue) clear() ([2500]*RawTweet, int) {
+func (q *Queue) clear() ([500]*RawTweet, int) {
 	rts := q.rts
 	size := q.size
 
-	q.rts = [2500]*RawTweet{}
+	q.rts = [500]*RawTweet{}
 	q.size = 0
 
 	return rts, size
