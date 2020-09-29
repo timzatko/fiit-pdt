@@ -151,7 +151,7 @@ func (q *Queue) process(rts *[10000]*RawTweet, batchId int, size int) {
 
 		var loc interface{} = nil
 		if rt.Geo != nil {
-			loc = clause.Expr{SQL: "ST_SetSRID(ST_MakePoint(%f, %f), 4326)", Vars: []interface{}{rt.Geo.Coordinates[0], rt.Geo.Coordinates[1]}}
+			loc = clause.Expr{SQL: "ST_SetSRID(ST_MakePoint(?, ?), 4326)", Vars: []interface{}{rt.Geo.Coordinates[0], rt.Geo.Coordinates[1]}}
 		}
 
 		var cid interface{} = nil
