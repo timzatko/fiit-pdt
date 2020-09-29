@@ -12,7 +12,7 @@
 ## Setup
 
 1. Navigate to the root of the repository and load environment variables by running - `source .env` [[reference]](https://gist.github.com/mihow/9c7f559807069a03e302605691f85572#gistcomment-2721971)
-2. Run PostgreSQL via docker-compose. Database will be running on `localhost:5432` and the adminer will be available at `http://localhost:8080`.
+2. Run PostgreSQL via docker-compose. Database will be running on `localhost:5432` and the adminer will be available at `http://localhost:8080`. You can also run it in detached mode by providing `-d` flag (useful when doing bulk import). 
 ```bash
 docker-compose up
 ```
