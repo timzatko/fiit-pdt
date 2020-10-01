@@ -42,10 +42,6 @@ func (q *Queue) IsEmpty() bool {
 }
 
 func (q *Queue) Flush() {
-	if !q.IsFull() {
-		return
-	}
-
 	if err := q.sync.Acquire(); err != nil {
 		log.Panicf("failed to acquire semaphore: %v", err)
 	}

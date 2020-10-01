@@ -114,7 +114,7 @@ func readFile(db *gorm.DB, synchronizer *utils.Synchronizer, dataDir string, fil
 		rawTweet, err := parseJson([]byte(j))
 
 		if err != nil {
-			log.Printf("unable to unmarshal %s", j)
+			log.Printf("error: unable to unmarshal %s", j)
 			continue
 		}
 
