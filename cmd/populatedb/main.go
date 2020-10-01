@@ -20,6 +20,8 @@ import (
 )
 
 func main() {
+	logLevel := 0
+
 	// connect to the database
 	db, err := database.Connect()
 	if err != nil {
@@ -36,7 +38,7 @@ func main() {
 	fmt.Print("reading files...")
 	fmt.Print(fileNames)
 
-	readFiles(db, dataDir, fileNames)
+	readFiles(db, dataDir, fileNames, logLevel)
 }
 
 func getFiles(dataDir string) []string {
@@ -57,18 +59,18 @@ func getFiles(dataDir string) []string {
 	return fileNames
 }
 
-func readFiles(db *gorm.DB, dataDir string, files []string) {
+func readFiles(db *gorm.DB, dataDir string, files []string, logLevel int) {
 	ctx := context.TODO()
 	synchronizer := utils.NewSynchronizer(ctx, 16)
 
 	for i, file := range files {
-		readFile(db, &synchronizer, dataDir, file, i+1, len(files))
+		readFile(db, &synchronizer, dataDir, file, i+1, len(files), logLevel)
 	}
 
 	synchronizer.Wait()
 }
 
-func readFile(db *gorm.DB, synchronizer *utils.Synchronizer, dataDir string, fileName string, i int, c int) {
+func readFile(db *gorm.DB, synchronizer *utils.Synchronizer, dataDir string, fileName string, i int, c int, logLevel int) {
 	log.Printf("reading file %s (%d/%d)...", fileName, i, c)
 	defer timer.Duration(timer.Track(fmt.Sprintf("done reading %s (%d/%d)...", fileName, i, c)))
 
@@ -103,7 +105,7 @@ func readFile(db *gorm.DB, synchronizer *utils.Synchronizer, dataDir string, fil
 	}()
 
 	// create a new queue for entities
-	q := utils.NewQueue(db, synchronizer)
+	q := utils.NewQueue(db, synchronizer, logLevel)
 
 	s := bufio.NewScanner(gz)
 	for s.Scan() {

@@ -16,18 +16,20 @@ import (
 type Queue struct {
 	// when using higher values than 5000 (eg. 10000)
 	// the tweets won't be imported
-	rts     [500]*RawTweet
-	size    int
-	db      *gorm.DB
-	sync    *Synchronizer
-	counter int
+	rts      [500]*RawTweet
+	size     int
+	db       *gorm.DB
+	sync     *Synchronizer
+	counter  int
+	logLevel int
 }
 
-func NewQueue(db *gorm.DB, synchronizer *Synchronizer) Queue {
+func NewQueue(db *gorm.DB, synchronizer *Synchronizer, logLevel int) Queue {
 	return Queue{
-		db:      db,
-		sync:    synchronizer,
-		counter: 0,
+		db:       db,
+		sync:     synchronizer,
+		counter:  0,
+		logLevel: logLevel,
 	}
 }
 
@@ -69,10 +71,12 @@ func (q *Queue) Enqueue(rt *RawTweet) {
 }
 
 func (q *Queue) process(rts *[500]*RawTweet, batchId int, size int) {
-	log.Printf("processing batch #%d with %d tweets...", batchId, size)
-
 	defer q.sync.Release()
-	defer timer.Duration(timer.Track(fmt.Sprintf("batch %d processed!", batchId)))
+
+	if q.logLevel > 1 {
+		log.Printf("processing batch #%d with %d tweets...", batchId, size)
+		defer timer.Duration(timer.Track(fmt.Sprintf("batch %d processed!", batchId)))
+	}
 
 	// ACCOUNTS
 	var accs []model.Account
@@ -101,7 +105,9 @@ func (q *Queue) process(rts *[500]*RawTweet, batchId int, size int) {
 	}
 	// insert to accounts table
 	if len(accs) > 0 {
-		log.Printf("batch #%d inserting %d accounts...", batchId, len(accs))
+		if q.logLevel > 1 {
+			log.Printf("batch #%d inserting %d accounts...", batchId, len(accs))
+		}
 		q.insert(&accs, &q.sync.AccountsMutex)
 	}
 
@@ -120,7 +126,9 @@ func (q *Queue) process(rts *[500]*RawTweet, batchId int, size int) {
 
 	// insert to hashtags table
 	if len(hts) > 0 {
-		log.Printf("batch #%d inserting %d hashtags...", batchId, len(hts))
+		if q.logLevel > 1 {
+			log.Printf("batch #%d inserting %d hashtags...", batchId, len(hts))
+		}
 		res := q.insert(&hts, &q.sync.HashtagsMutex)
 		if res.Error != nil {
 			log.Panicf("error: batch #%d unable to insert hashtags: %s", batchId, res.Error)
@@ -144,7 +152,9 @@ func (q *Queue) process(rts *[500]*RawTweet, batchId int, size int) {
 
 	// insert to countries database
 	if len(countries) > 0 {
-		log.Printf("batch #%d inserting %d countries...", batchId, len(countries))
+		if q.logLevel > 1 {
+			log.Printf("batch #%d inserting %d countries...", batchId, len(countries))
+		}
 		res := q.insert(&countries, &q.sync.CountriesMutex)
 		if res.Error != nil {
 			log.Panicf("error: batch #%d unable to insert countries: %s", batchId, res.Error)
@@ -187,7 +197,9 @@ func (q *Queue) process(rts *[500]*RawTweet, batchId int, size int) {
 	}
 
 	// insert to tweets table
-	log.Printf("batch #%d inserting %d tweets...", batchId, len(tweets))
+	if q.logLevel > 1 {
+		log.Printf("batch #%d inserting %d tweets...", batchId, len(tweets))
+	}
 	res := q.db.Model(model.Tweet{}).Clauses(clause.OnConflict{DoNothing: true}).Create(tweets)
 	q.sync.TweetsMutex.Unlock()
 	if res.Error != nil {
@@ -210,7 +222,9 @@ func (q *Queue) process(rts *[500]*RawTweet, batchId int, size int) {
 
 	if len(ths) > 0 {
 		q.sync.TweetHashtagsMutex.Lock()
-		log.Printf("batch #%d inserting %d tweet hashtags...", batchId, len(ths))
+		if q.logLevel > 1 {
+			log.Printf("batch #%d inserting %d tweet hashtags...", batchId, len(ths))
+		}
 		res := q.db.Model(model.TweetHashtag{}).Clauses(clause.OnConflict{DoNothing: true}).Create(ths)
 		q.sync.TweetHashtagsMutex.Unlock()
 		if res.Error != nil {
@@ -234,7 +248,9 @@ func (q *Queue) process(rts *[500]*RawTweet, batchId int, size int) {
 
 	// insert to tweet mentions table
 	if len(tms) > 0 {
-		log.Printf("batch #%d inserting %d tweet mentions...", batchId, len(tms))
+		if q.logLevel > 1 {
+			log.Printf("batch #%d inserting %d tweet mentions...", batchId, len(tms))
+		}
 		res := q.insert(&tms, &q.sync.TweetMentionsMutex)
 		if res.Error != nil {
 			log.Panicf("error: batch #%d unable to insert tweet mentions: %s", batchId, res.Error)
