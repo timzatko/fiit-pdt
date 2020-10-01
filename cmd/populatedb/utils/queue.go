@@ -165,7 +165,7 @@ func (q *Queue) process(rts *[500]*RawTweet, batchId int, size int) {
 
 		var cid interface{} = nil
 		if rt.Place != nil && len(rt.Place.CountryCode) > 0 {
-			cid = clause.Expr{SQL: "(SELECT id FROM countries WHERE name=? LIMIT 1)", Vars: []interface{}{rt.Place.Country}}
+			cid = clause.Expr{SQL: "(SELECT id FROM countries WHERE code=? LIMIT 1)", Vars: []interface{}{rt.Place.CountryCode}}
 		}
 
 		var pid interface{} = nil
