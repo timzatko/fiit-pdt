@@ -104,7 +104,10 @@ func (q *Queue) process(rts *[500]*RawTweet, batchId int, size int) {
 		if q.logLevel > 1 {
 			log.Printf("batch #%d inserting %d accounts...", batchId, len(accs))
 		}
-		q.insert(&accs, &q.sync.AccountsMutex)
+		res := q.insert(&accs, &q.sync.AccountsMutex)
+		if res.Error != nil {
+			log.Panicf("error: batch #%d unable to insert accounts: %s", batchId, res.Error)
+		}
 	}
 
 	// HASHTAGS
