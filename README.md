@@ -17,3 +17,8 @@
 docker-compose up
 ```
 3. Run migrations by navigating to the migrations' directory (`cd migrations`) and executing `make init`.
+
+### Data
+
+You need to download data to [data](./data) directory, download link is in [data/README.txt](./data/README.txt).
+The smaller subset of data is directly in the repository in [data/examples](./data/examples).
