@@ -4,6 +4,7 @@ version: '3.1'
 
 volumes:
   postgis-data:
+  pgadmin-data:
 
 services:
 
@@ -21,8 +22,14 @@ services:
       - "5432:5432" # expose postgresql ports to local machine and other services
     command: "-c log_statement=none" # "-c log_statement=all" # use this for debugging
 
-  adminer:
-    image: adminer
+  pgadmin:
+    image: dpage/pgadmin4
+    environment:
+      PGADMIN_DEFAULT_EMAIL: "${PGADMIN_DEFAULT_EMAIL}"
+      PGADMIN_DEFAULT_PASSWORD: "${PGADMIN_DEFAULT_PASSWORD}"
+      PGADMIN_LISTEN_PORT: 8080
     restart: always
+    volumes:
+      - pgadmin-data:/var/lib/pgadmin
     ports:
       - 8080:8080
