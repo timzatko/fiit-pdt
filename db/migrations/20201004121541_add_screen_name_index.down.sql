@@ -1,1 +1,1 @@
-DROP INDEX index_screen_name ON accounts;
+DROP INDEX IF EXISTS index_screen_name CASCADE;
