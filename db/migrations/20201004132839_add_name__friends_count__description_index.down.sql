@@ -1,0 +1,3 @@
+DROP INDEX IF EXISTS index_name CASCADE;
+DROP INDEX IF EXISTS index_friends_count CASCADE;
+DROP INDEX IF EXISTS index_description CASCADE;
