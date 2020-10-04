@@ -14,13 +14,14 @@ services:
     restart: always
     volumes:
       - postgis-data:/var/lib/postgresql
+      - ./postgresql.conf:/etc/postgresql/postgresql.conf
     environment:
       POSTGRES_DB: "${PDT_DATABASE_DB}"
       POSTGRES_USER: "${PDT_DATABASE_USER}"
       POSTGRES_PASSWORD: "${PDT_DATABASE_PASSWORD}"
     ports:
       - "5432:5432" # expose postgresql ports to local machine and other services
-    command: "-c log_statement=none" # "-c log_statement=all" # use this for debugging
+    command: "-c log_statement=none -c config_file=/etc/postgresql/postgresql.conf" # "-c log_statement=all" # use this for debugging
 
   pgadmin:
     image: dpage/pgadmin4
