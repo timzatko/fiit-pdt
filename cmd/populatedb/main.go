@@ -61,7 +61,7 @@ func getFiles(dataDir string) []string {
 
 func readFiles(db *gorm.DB, dataDir string, files []string, logLevel int) {
 	ctx := context.TODO()
-	synchronizer := utils.NewSynchronizer(ctx, 16)
+	synchronizer := utils.NewSynchronizer(ctx, 4)
 
 	for i, file := range files {
 		readFile(db, &synchronizer, dataDir, file, i+1, len(files), logLevel)
