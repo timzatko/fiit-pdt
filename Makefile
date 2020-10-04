@@ -18,5 +18,11 @@ db-seed:
 db-migrate-up:
 	migrate -database "postgres://${PDT_DATABASE_USER}:${PDT_DATABASE_PASSWORD}@localhost:5432/${PDT_DATABASE_DB}?sslmode=disable" -path db/migrations up
 
+db-migrate-up-one:
+	migrate -database "postgres://${PDT_DATABASE_USER}:${PDT_DATABASE_PASSWORD}@localhost:5432/${PDT_DATABASE_DB}?sslmode=disable" -path db/migrations up 1
+
+db-migrate-down-one:
+	migrate -database "postgres://${PDT_DATABASE_USER}:${PDT_DATABASE_PASSWORD}@localhost:5432/${PDT_DATABASE_DB}?sslmode=disable" -path db/migrations down 1
+
 db-migrate-drop:
 	migrate -database "postgres://${PDT_DATABASE_USER}:${PDT_DATABASE_PASSWORD}@localhost:5432/${PDT_DATABASE_DB}?sslmode=disable" -path db/migrations drop
