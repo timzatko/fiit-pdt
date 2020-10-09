@@ -1,5 +1,7 @@
 # Zadanie: Postgres - Indexácia
 
+**Timotej Zaťko**
+
 ## Otázky
 
 1. Vyhľadajte v accounts screen_name s presnou hodnotou ‘realDonaldTrump’ a analyzujte daný select. Akú metódu vám vybral plánovač?
