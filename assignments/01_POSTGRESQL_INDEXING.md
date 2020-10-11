@@ -2,7 +2,7 @@
 
 **Timotej Zaťko**
 
-## Otázky
+## Zadanie
 
 1. Vyhľadajte v accounts screen_name s presnou hodnotou ‘realDonaldTrump’ a analyzujte daný select. Akú metódu vám vybral plánovač?
 2. Koľko workerov pracovalo na danom selecte? Zdvihnite počet workerov apovedzte ako to ovplyvňuje čas. Je tam nejaký strop?
