@@ -353,4 +353,123 @@ Query sa vykonala rýchlejšie - __75.891 ms__, v prechádzajúcej úlohe sa vyk
 
 ### 7. Upravte query tak, aby bol follower_count menší ako 1000 a friends_count vačší ako 1000. V čom je rozdiel a prečo?
 
-### 8. Vyhľadajte všetky tweety (content), ktoré spomenul autor, ktorý obsahuje v popise (description) reťazec „comedian” (case insensitive), tweety musia obsahovať reťazec „conspiracy“ (case insensitive), tweety nesmú mať priradený hashtag a počet retweetov tweetu (retweet_count) je buď menší rovný 10, alebo väčší ako 50. Zobrazte len rozdielne záznamy a zoraďte ich podľa počtu followerov DESC a pobavte sa. Mimo to si nad tým spravte analýzu a tú popíšte do protokolu - čo všetko sa tam deje (explain analyse).
+Query:
+```postgresql
+EXPLAIN ANALYZE SELECT COUNT(*) FROM accounts a WHERE a.followers_count < 1000 AND a.friends_count > 1000 ORDER BY a.statuses_count;
+```
+
+Result:
+```postgresql
+                                                                 QUERY PLAN
+---------------------------------------------------------------------------------------------------------------------------------------------
+ Gather Merge  (cost=99563.89..172610.64 rows=610072 width=112) (actual time=4933.376..12669.355 rows=265256 loops=1)
+   Workers Planned: 4
+   Workers Launched: 1
+   ->  Sort  (cost=98563.83..98945.13 rows=152518 width=112) (actual time=4723.673..6645.001 rows=132628 loops=2)
+         Sort Key: statuses_count
+         Sort Method: external merge  Disk: 19728kB
+         Worker 0:  Sort Method: external merge  Disk: 18768kB
+         ->  Parallel Seq Scan on accounts a  (cost=0.00..76567.59 rows=152518 width=112) (actual time=49.301..2588.959 rows=132628 loops=2)
+               Filter: ((followers_count < 1000) AND (friends_count > 1000))
+               Rows Removed by Filter: 1601584
+ Planning Time: 0.405 ms
+ JIT:
+   Functions: 4
+   Options: Inlining false, Optimization false, Expressions true, Deforming true
+   Timing: Generation 5.214 ms, Inlining 0.000 ms, Optimization 44.402 ms, Emission 42.426 ms, Total 92.042 ms
+ Execution Time: 16215.766 ms
+(16 rows)
+```
+
+Použil sa _Parallel Sequential Scan_ pretože plánovač vyhodnotil, že query vyberie príliš veľa riadkov, že by index scan nebol výhodný.
+Plánovač aj mal pravdu, pretože vybral _265 256_ riadkov z celkového počtu _3 468 423_ čo je viac ako _7%_.
+
+### 8. Vyhľadajte všetky tweety (content), ktoré spomenuli account, ktorý obsahuje v popise (description) reťazec „comedian” (case insensitive), tweety musia obsahovať reťazec „conspiracy“ (case insensitive), tweety nesmú mať priradený hashtag a počet retweetov tweetu (retweet_count) je buď menší rovný 10, alebo väčší ako 50. Zobrazte len rozdielne záznamy a zoraďte ich podľa počtu followerov DESC a pobavte sa. Mimo to si nad tým spravte analýzu a tú popíšte do protokolu - čo všetko sa tam deje (explain analyse).
+
+Query:
+```postgresql
+explain analyze select distinct t.content, a.followers_count from tweets t
+    join tweet_mentions tm on tm.tweet_id = t.id
+    join accounts a on tm.account_id = a.id
+where
+    (t.retweet_count <= 10 or t.retweet_count > 50) and
+    t.content ilike '%conspiracy%' and
+    a.description ilike '%comedian%' and
+    t.id not in (select tweet_id from tweet_hashtags)
+order by a.followers_count desc;
+```
+
+Result:
+```postgresql
+                                                                                     QUERY PLAN
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+ Unique  (cost=6106550.52..6106550.53 rows=1 width=155) (actual time=130242.284..130247.938 rows=3 loops=1)
+   ->  Sort  (cost=6106550.52..6106550.53 rows=1 width=155) (actual time=130242.269..130247.820 rows=3 loops=1)
+         Sort Key: a.followers_count DESC, t.content
+         Sort Method: quicksort  Memory: 26kB
+         ->  Gather  (cost=1014.82..6106550.51 rows=1 width=155) (actual time=129547.633..130247.709 rows=3 loops=1)
+               Workers Planned: 4
+               Workers Launched: 4
+               ->  Nested Loop  (cost=14.82..6105550.41 rows=1 width=155) (actual time=83962.895..83973.012 rows=1 loops=5)
+                     ->  Nested Loop  (cost=14.26..113454.79 rows=132 width=24) (actual time=686.332..5887.861 rows=5370 loops=5)
+                           ->  Parallel Seq Scan on accounts a  (cost=0.00..74399.82 rows=63 width=12) (actual time=680.907..5452.443 rows=471 loops=5)
+                                 Filter: (description ~~* '%comedian%'::text)
+                                 Rows Removed by Filter: 693214
+                           ->  Bitmap Heap Scan on tweet_mentions tm  (cost=14.26..617.64 rows=228 width=28) (actual time=0.194..0.565 rows=11 loops=2354)
+                                 Recheck Cond: (account_id = a.id)
+                                 Heap Blocks: exact=8586
+                                 ->  Bitmap Index Scan on tweet_mentions_account_id_tweet_id_key  (cost=0.00..14.20 rows=228 width=0) (actual time=0.131..0.131 rows=11 loops=2354)
+                                       Index Cond: (account_id = a.id)
+                     ->  Index Scan using tweets_pkey on tweets t  (cost=0.56..45391.59 rows=1 width=171) (actual time=14.499..14.499 rows=0 loops=26852)
+                           Index Cond: ((id)::text = (tm.tweet_id)::text)
+                           Filter: ((content ~~* '%conspiracy%'::text) AND ((retweet_count <= 10) OR (retweet_count > 50)) AND (NOT (SubPlan 1)))
+                           Rows Removed by Filter: 1
+                           SubPlan 1
+                             ->  Materialize  (cost=0.00..83507.90 rows=2909527 width=20) (actual time=0.120..95705.576 rows=2907967 loops=3)
+                                   ->  Seq Scan on tweet_hashtags  (cost=0.00..51911.27 rows=2909527 width=20) (actual time=0.104..33345.474 rows=2907967 loops=3)
+ Planning Time: 10.424 ms
+ JIT:
+   Functions: 96
+   Options: Inlining true, Optimization true, Expressions true, Deforming true
+   Timing: Generation 52.502 ms, Inlining 887.864 ms, Optimization 1544.050 ms, Emission 948.174 ms, Total 3432.589 ms
+ Execution Time: 130266.613 ms
+(30 rows)
+```
+
+Po vymazaní indexu `tweet_mentions_account_id_tweet_id_key`.
+
+Result:
+```postgresql
+                                                                              QUERY PLAN
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+ Unique  (cost=6152371.34..6152371.35 rows=1 width=155) (actual time=299346.896..299367.256 rows=3 loops=1)
+   ->  Sort  (cost=6152371.34..6152371.34 rows=1 width=155) (actual time=299346.881..299360.318 rows=3 loops=1)
+         Sort Key: a.followers_count DESC, t.content
+         Sort Method: quicksort  Memory: 26kB
+         ->  Gather  (cost=75401.17..6152371.33 rows=1 width=155) (actual time=283217.396..299359.956 rows=3 loops=1)
+               Workers Planned: 4
+               Workers Launched: 4
+               ->  Nested Loop  (cost=74401.17..6151371.23 rows=1 width=155) (actual time=239180.236..239181.434 rows=1 loops=5)
+                     ->  Parallel Hash Join  (cost=74400.61..159275.60 rows=132 width=24) (actual time=5873.327..131902.488 rows=5370 loops=5)
+                           Hash Cond: (tm.account_id = a.id)
+                           ->  Parallel Seq Scan on tweet_mentions tm  (cost=0.00..80123.37 rows=1810137 width=28) (actual time=0.031..65703.815 rows=1447533 loops=5)
+                           ->  Parallel Hash  (cost=74399.82..74399.82 rows=63 width=12) (actual time=5854.644..5854.688 rows=471 loops=5)
+                                 Buckets: 1024  Batches: 1  Memory Usage: 168kB
+                                 ->  Parallel Seq Scan on accounts a  (cost=0.00..74399.82 rows=63 width=12) (actual time=1151.037..5840.243 rows=471 loops=5)
+                                       Filter: (description ~~* '%comedian%'::text)
+                                       Rows Removed by Filter: 693214
+                     ->  Index Scan using tweets_pkey on tweets t  (cost=0.56..45391.59 rows=1 width=171) (actual time=19.871..19.871 rows=0 loops=26852)
+                           Index Cond: ((id)::text = (tm.tweet_id)::text)
+                           Filter: ((content ~~* '%conspiracy%'::text) AND ((retweet_count <= 10) OR (retweet_count > 50)) AND (NOT (SubPlan 1)))
+                           Rows Removed by Filter: 1
+                           SubPlan 1
+                             ->  Materialize  (cost=0.00..83507.90 rows=2909527 width=20) (actual time=1.363..128417.095 rows=2907967 loops=3)
+                                   ->  Seq Scan on tweet_hashtags  (cost=0.00..51911.27 rows=2909527 width=20) (actual time=1.346..45302.135 rows=2907967 loops=3)
+ Planning Time: 4.026 ms
+ JIT:
+   Functions: 121
+   Options: Inlining true, Optimization true, Expressions true, Deforming true
+   Timing: Generation 55.566 ms, Inlining 881.741 ms, Optimization 3157.906 ms, Emission 1677.771 ms, Total 5772.985 ms
+ Execution Time: 299414.973 ms
+(29 rows)
+```
