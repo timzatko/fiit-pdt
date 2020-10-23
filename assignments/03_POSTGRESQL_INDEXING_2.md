@@ -1,4 +1,4 @@
-# Zadanie: Postgres - Indexácia 2
+# 3. Zadanie: Postgres - Indexácia 2
 
 **Timotej Zaťko**
 

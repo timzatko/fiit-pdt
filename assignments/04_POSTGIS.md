@@ -1,4 +1,4 @@
-# Zadanie: Postgis 1
+# 4. Zadanie: Postgis 1
 
 **Timotej Zaťko**
 
