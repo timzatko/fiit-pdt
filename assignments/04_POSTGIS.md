@@ -159,10 +159,10 @@ To je niečo viac ako 3704 metrov - tj. 3.7 km.
 
 ### 9. Stiahnite si QGIS a vyplotujte kraje a váš dom z úlohy 2 na mape - napr. červenou čiarou.
 
-Vyplotované kraje na Slovensku
+Vyplotované kraje na Slovensku - zvolil som čierne okraje a dúhovú výplň.
 
 ![](./images/008.png)
 
-Môj dom, môj hrad! Na Dolinke 439/6 Čierne Kľačany.
+Môj dom, môj hrad! Na Dolinke 439/6 Čierne Kľačany. Zvolil som červený okraj a červenú výplň.
 
 ![](./images/009.png)
