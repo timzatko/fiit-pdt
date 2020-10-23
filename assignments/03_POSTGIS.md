@@ -36,6 +36,8 @@ select name, jsonb_pretty((st_asgeojson(st_transform(way, 4326)) :: json->'coord
 Result:
 ![](./images/001.png)
 
+Koordináty som si vypísal, ako text v podobe serializovaného json-u.
+
 ### 3. zoraďte kraje podľa ich veľkosti (st_area)
 
 Query:
@@ -56,7 +58,7 @@ Query:
 INSERT INTO planet_osm_polygon ("addr:housename", "addr:housenumber", way) VALUES (
   'Na Dolinke',
   '439/6',
-  st_transform(st_polygonfromtext('POLYGON((18.414200 48.355131, 18.414322 48.355120, 18.414279 48.354938, 18.414284 48.354949, 18.414150 48.354970, 18.414200 48.355131))', 4326), 3857)
+  ST_Transform(ST_PolygonFromText('POLYGON((18.414211 48.355163, 18.414375 48.355151, 18.414311 48.354921, 18.414145 48.354950, 18.414211 48.355163))', 4326), 3857)
 );
 ```
 
@@ -79,7 +81,7 @@ select name from planet_osm_polygon where admin_level='4' and
     st_intersects(
         st_geomfromwkb(way),
         st_geomfromwkb((select way from planet_osm_polygon 
-            where "addr:housename" = 'na dolinke' and "addr:housenumber" = '439/6')))
+            where "addr:housename" = 'Na Dolinke' and "addr:housenumber" = '439/6')))
 ```
 
 Result:
@@ -88,6 +90,8 @@ Result:
 Áno, bývam v Nitrianskom kraji :)
 
 ### 6. pridajte si do planet_osm_point vašu aktuálnu polohu (pozor na súradnicový systém)
+
+Momentálne nie som doma :-).
 
 Query:
 ```postgresql
@@ -151,4 +155,14 @@ select (st_distance(
 Result:
 ![](./images/007.png)
 
+To je niečo viac ako 3704 metrov - tj. 3.7 km.
+
 ### 9. Stiahnite si QGIS a vyplotujte kraje a váš dom z úlohy 2 na mape - napr. červenou čiarou.
+
+Vyplotované kraje na Slovensku
+
+![](./images/008.png)
+
+Môj dom, môj hrad! Na Dolinke 439/6 Čierne Kľačany.
+
+![](./images/009.png)
