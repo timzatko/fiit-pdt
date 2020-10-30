@@ -39,19 +39,18 @@ Result:
 
 ### 2. Vytvorte priestorovú tabuľku všetkých úsekov ciest, ktorých vzdialenosť od vzájomnej hranice okresov Malacky a Pezinok je menšia ako 10 km.
 
-Vytvoríme tabuľku...
-
 Pomocou `st_intersection` zistíme spoločnú hranicu oboch okresov. 
 
-
-Ďalej pomocou `st_buffer` vytvoríme oblasť do vzdialenosti 10km od tejto spoločnej hranice.    
+Ďalej pomocou `st_buffer` vytvoríme oblasť do vzdialenosti 10km od tejto spoločnej hranice. Obrázok nižšie ukazuje ako funguje `st_buffer`. 
 ![](./images/014.png)
+
+Vybral som iba také cesty, ktoré nemajú nastavené `highway` na null (aby som vyfiltroval hranice okresov atď...) 
 
 Potom vyberieme také cesty, ktoré sa nachádzajú v tejto vytvorenej oblasti, tj. vzdialenosť vo všetkých bodoch týchto ciest je do 10km.
 
 Query:
 ```postgresql
-create table planet_osm_roads_malacky_pezinok as (select * from planet_osm_roads
+create table planet_osm_roads_malacky_pezinok_contains as (select * from planet_osm_roads
     where st_contains
     (
         (select st_buffer(
@@ -67,7 +66,7 @@ create table planet_osm_roads_malacky_pezinok as (select * from planet_osm_roads
                 )
             ), 10000, 'endcap=round join=round')
         ), way
-    )
+    ) and highway is not null
 );
 ```
 
@@ -79,10 +78,10 @@ Sivá - okres pezinok.
 
 ![](./images/012.png)
 
-V prípade, že by sme chceli všetky cesty, ktoré majú taký úsek, ktorý sa nachádza do 10km od tejto hranice, spravíme nasledovnú query.
+V prípade, že by sme chceli všetky cesty, ktoré majú takú časť, ktorá sa nachádza do 10km od tejto hranice, spravíme nasledovnú query. (tj. cesta je aspoň v jednom bude do vzdialenosti 10km od tej hranice)
 
 ```postgresql
-create table planet_osm_roads_malacky_pezinok as (select * from planet_osm_roads
+create table planet_osm_roads_malacky_pezinok_intersects as (select * from planet_osm_roads
     where st_intersects
     (
         (select st_buffer(
@@ -98,7 +97,7 @@ create table planet_osm_roads_malacky_pezinok as (select * from planet_osm_roads
                 )
             ), 10000, 'endcap=round join=round')
         ), way
-    )
+    ) and highway is not null
 );
 ```
 
@@ -138,21 +137,21 @@ create table planet_osm_roads_malacky_pezinok_intersections as (select *, st_int
                         )
                     ), 10000, 'endcap=round join=round')
                 ), way
-            )
+            ) and highway is not null
     );
 ```
 
-[](./images/016.png)
+![](./images/016.png)
 
 ### 3. Jedným dopytom zistite číslo a názov katastrálneho územia (z dát ZBGIS, https://www.geoportal.sk/sk/zbgis_smd/na-stiahnutie/), v ktorom sa nachádza najdlhší úsek cesty (z dát OSM) v okrese, v ktorom bývate.
 
-Bývam v Zlatých Moravciach.
+Bývam v okrese Zlaté Moravce.
 
 Urobil som join hraníc katastrálnych území a ciest na ich prieniku - `st_intersects(st_transform(u.geom, 3857), p.way)`.
 Potom som pre tieto zlúčené záznamy vytvoril nový atribút `len`, ktorý je vlastne dĺžkou tohto prieniku - `st_length(st_intersection(st_transform(u.geom, 3857), p.way))`.
 Katastrálne územia som vyfiltroval podľa atribútu `"NM3"` a tak som získal iba územia z môjho okresu.
 Záznamy som zoradil od najväčšieho podľa `len`. A zobral som prvý záznam.
-Tak som vlastne získal také katastrálne územie z môjho okresu, v ktorom sa nachádza najdlhší úsek cesty.
+__Tak som vlastne získal také katastrálne územie z môjho okresu, v ktorom sa nachádza najdlhší úsek cesty.__
 
 Query:
 ```postgresql
@@ -205,7 +204,7 @@ insert into planet_osm_polygon ("name", "way") values ('Okolie_Bratislavy', st_d
 )
 ```
 
-Následne vypočítam jej rozlohu pomocou `st_area`, použijeme konverziu na _srid=4326_ a následne na `geography` a aby sme počítali aj zo zakrivením a tvarom zeme, výsledok udávame v metroch štvorcových.
+Následne vypočítam jej rozlohu pomocou `st_area`, použijeme konverziu na _srid=4326_ (kedže údaje v databáze mám v _srid=3857_) a následne na `geography` a aby sme počítali aj zo zakrivením a tvarom zeme, výsledok udávame v metroch štvorcových.
 
 Query:
 ```postgresql
