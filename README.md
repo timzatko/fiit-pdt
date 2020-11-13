@@ -16,7 +16,7 @@
 ```bash
 docker-compose up
 ```
-3. Run migrations by navigating to the migrations' directory (`cd migrations`) and executing `make init`.
+3. Run migrations by running - `make db-migrate-up`
 
 ### Data
 
