@@ -4,7 +4,3 @@ CREATE TABLE countries (
    name 			varchar(200),
    UNIQUE (code)
 );
-
-ALTER TABLE tweets
-    ADD CONSTRAINT fk_countries_tweets
-        FOREIGN KEY (country_id) REFERENCES countries(id);

@@ -8,6 +8,5 @@ CREATE TABLE tweets (
     author_id		bigint NOT NULL,
     country_id		integer,
     parent_id		varchar(20),
-    PRIMARY KEY (id),
-    FOREIGN KEY (parent_id) REFERENCES tweets(id)
+    PRIMARY KEY (id)
 )

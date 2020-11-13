@@ -16,7 +16,7 @@
 ```bash
 docker-compose up
 ```
-3. Run migrations by running - `make db-migrate-up`
+3. Run migrations by running - `make db-migrate-up`. I recommend running just the first 6 migrations with required tables by running - `make db-migrate-up-6`, then running `make db-seed` and then `make db-migrate-up`. The migration will be much faster because of no constraints.  
 
 ### Data
 
