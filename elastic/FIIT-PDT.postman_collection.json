@@ -1,0 +1,229 @@
+{
+	"info": {
+		"_postman_id": "3672fd64-95b3-477e-ae54-46bf1ff05df1",
+		"name": "FIIT-PDT",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "PUT Tweets Mapping",
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"dynamic\": \"strict\",\n    \"properties\": {\n        \"id\": {\n            \"type\": \"text\"\n        },\n        \"content\": {\n            \"type\": \"text\"\n        },\n        \"location\": {\n            \"type\": \"geo_point\"\n        },\n        \"retweet_count\": {\n            \"type\": \"integer\"\n        },\n        \"favorite_count\": {\n            \"type\": \"integer\"\n        },\n        \"happened_at\": {\n            \"type\": \"date\"\n        },\n        \"author\": {\n            \"properties\": {\n                \"id\": {\n                    \"type\": \"long\"\n                },\n                \"screen_name\": {\n                    \"type\": \"text\"\n                },\n                \"name\": {\n                    \"type\": \"text\"\n                },\n                \"description\": {\n                    \"type\": \"text\"\n                },\n                \"followers_count\": {\n                    \"type\": \"integer\"\n                },\n                \"friends_count\": {\n                    \"type\": \"integer\"\n                },\n                \"statuses_count\": {\n                    \"type\": \"integer\"\n                }\n            }\n        },\n        \"country\": {\n            \"properties\": {\n                \"code\": {\n                    \"type\": \"keyword\"\n                },\n                \"name\": {\n                    \"type\": \"text\"\n                }\n            }\n        },\n        \"hashtags\": {\n            \"type\": \"text\"\n        },\n        \"mentions\": {\n            \"properties\": {\n                \"id\": {\n                    \"type\": \"long\"\n                },\n                \"screen_name\": {\n                    \"type\": \"text\"\n                },\n                \"name\": {\n                    \"type\": \"text\"\n                }\n            }\n        },\n        \"parent_id\": {\n            \"type\": \"text\"\n        }\n    }\n}"
+				},
+				"url": {
+					"raw": "http://localhost:9200/tweets/_mapping",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "9200",
+					"path": [
+						"tweets",
+						"_mapping"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "GET Tweets Mapping",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "http://localhost:9200/tweets/_mapping",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "9200",
+					"path": [
+						"tweets",
+						"_mapping"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "GET Tweets",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n   \"size\": 10,\n   \"query\": {\n      \"match_all\": {}\n   }\n}"
+				},
+				"url": {
+					"raw": "http://localhost:9200/tweets/_search",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "9200",
+					"path": [
+						"tweets",
+						"_search"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "PUT Tweets Settings",
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"settings\": {\n    \"number_of_shards\": 3,\n    \"number_of_replicas\": 3\n  }\n}"
+				},
+				"url": {
+					"raw": "http://localhost:9200/tweets",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "9200",
+					"path": [
+						"tweets"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "DELETE Tweets",
+			"request": {
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "http://localhost:9200/tweets",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "9200",
+					"path": [
+						"tweets"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "PUT Tweet",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"created_at\": \"Sat Aug 01 01:59:54 +0000 2020\",\n  \"id\": 1289380305023848448,\n  \"id_str\": \"1289380305023848448\",\n  \"full_text\": \"RT @somebadideas: We really going to let the politicians who did nothing about school shootings handle this one..?\",\n  \"truncated\": false,\n  \"display_text_range\": [\n    0,\n    114\n  ],\n  \"entities\": {\n    \"hashtags\": [],\n    \"symbols\": [],\n    \"user_mentions\": [\n      {\n        \"screen_name\": \"somebadideas\",\n        \"name\": \"Aaron Stewart-Ahn\",\n        \"id\": 25484126,\n        \"id_str\": \"25484126\",\n        \"indices\": [\n          3,\n          16\n        ]\n      }\n    ],\n    \"urls\": []\n  },\n  \"source\": \"<a href=\\\"http://twitter.com/download/iphone\\\" rel=\\\"nofollow\\\">Twitter for iPhone</a>\",\n  \"in_reply_to_status_id\": null,\n  \"in_reply_to_status_id_str\": null,\n  \"in_reply_to_user_id\": null,\n  \"in_reply_to_user_id_str\": null,\n  \"in_reply_to_screen_name\": null,\n  \"user\": {\n    \"id\": 744234863008481280,\n    \"id_str\": \"744234863008481280\",\n    \"name\": \"Sarah \\ud83d\\ude1d\\ud83d\\ude1d\",\n    \"screen_name\": \"StepTFup_KAIyle\",\n    \"location\": \"\",\n    \"description\": \"\",\n    \"url\": null,\n    \"entities\": {\n      \"description\": {\n        \"urls\": []\n      }\n    },\n    \"protected\": false,\n    \"followers_count\": 75,\n    \"friends_count\": 231,\n    \"listed_count\": 2,\n    \"created_at\": \"Sat Jun 18 18:26:33 +0000 2016\",\n    \"favourites_count\": 14124,\n    \"utc_offset\": null,\n    \"time_zone\": null,\n    \"geo_enabled\": false,\n    \"verified\": false,\n    \"statuses_count\": 36102,\n    \"lang\": null,\n    \"contributors_enabled\": false,\n    \"is_translator\": false,\n    \"is_translation_enabled\": false,\n    \"profile_background_color\": \"F5F8FA\",\n    \"profile_background_image_url\": null,\n    \"profile_background_image_url_https\": null,\n    \"profile_background_tile\": false,\n    \"profile_image_url\": \"http://pbs.twimg.com/profile_images/1174701267106566147/YIeKB8ea_normal.jpg\",\n    \"profile_image_url_https\": \"https://pbs.twimg.com/profile_images/1174701267106566147/YIeKB8ea_normal.jpg\",\n    \"profile_banner_url\": \"https://pbs.twimg.com/profile_banners/744234863008481280/1541005674\",\n    \"profile_image_extensions_alt_text\": null,\n    \"profile_banner_extensions_alt_text\": null,\n    \"profile_link_color\": \"1DA1F2\",\n    \"profile_sidebar_border_color\": \"C0DEED\",\n    \"profile_sidebar_fill_color\": \"DDEEF6\",\n    \"profile_text_color\": \"333333\",\n    \"profile_use_background_image\": true,\n    \"has_extended_profile\": true,\n    \"default_profile\": true,\n    \"default_profile_image\": false,\n    \"following\": false,\n    \"follow_request_sent\": false,\n    \"notifications\": false,\n    \"translator_type\": \"none\"\n  },\n  \"geo\": null,\n  \"coordinates\": null,\n  \"place\": null,\n  \"contributors\": null,\n  \"retweeted_status\": {\n    \"created_at\": \"Sat Aug 01 00:47:13 +0000 2020\",\n    \"id\": 1289362012523266049,\n    \"id_str\": \"1289362012523266049\",\n    \"full_text\": \"We really going to let the politicians who did nothing about school shootings handle this one..? https://t.co/dAxlki9Sx4\",\n    \"truncated\": false,\n    \"display_text_range\": [\n      0,\n      96\n    ],\n    \"entities\": {\n      \"hashtags\": [],\n      \"symbols\": [],\n      \"user_mentions\": [],\n      \"urls\": [\n        {\n          \"url\": \"https://t.co/dAxlki9Sx4\",\n          \"expanded_url\": \"https://twitter.com/thehill/status/1289359451393155072\",\n          \"display_url\": \"twitter.com/thehill/status\\u2026\",\n          \"indices\": [\n            97,\n            120\n          ]\n        }\n      ]\n    },\n    \"source\": \"<a href=\\\"http://twitter.com/download/iphone\\\" rel=\\\"nofollow\\\">Twitter for iPhone</a>\",\n    \"in_reply_to_status_id\": null,\n    \"in_reply_to_status_id_str\": null,\n    \"in_reply_to_user_id\": null,\n    \"in_reply_to_user_id_str\": null,\n    \"in_reply_to_screen_name\": null,\n    \"user\": {\n      \"id\": 25484126,\n      \"id_str\": \"25484126\",\n      \"name\": \"Aaron Stewart-Ahn\",\n      \"screen_name\": \"somebadideas\",\n      \"location\": \"Shadow Mountains, USA\",\n      \"description\": \"THE WITCHER: BLOOD ORIGIN \\u25ab\\ufe0f MANDY \\u25ab\\ufe0f THOR: METAL GODS \\u25ab\\ufe0f PARK in @dazed S/S 2020 \\u25ab\\ufe0fLee Chang-dong & SUNMI fan account\",\n      \"url\": \"https://t.co/5BDsU9Ciql\",\n      \"entities\": {\n        \"url\": {\n          \"urls\": [\n            {\n              \"url\": \"https://t.co/5BDsU9Ciql\",\n              \"expanded_url\": \"http://asahn.me\",\n              \"display_url\": \"asahn.me\",\n              \"indices\": [\n                0,\n                23\n              ]\n            }\n          ]\n        },\n        \"description\": {\n          \"urls\": []\n        }\n      },\n      \"protected\": false,\n      \"followers_count\": 21956,\n      \"friends_count\": 3301,\n      \"listed_count\": 429,\n      \"created_at\": \"Fri Mar 20 09:59:35 +0000 2009\",\n      \"favourites_count\": 131256,\n      \"utc_offset\": null,\n      \"time_zone\": null,\n      \"geo_enabled\": false,\n      \"verified\": true,\n      \"statuses_count\": 9664,\n      \"lang\": null,\n      \"contributors_enabled\": false,\n      \"is_translator\": false,\n      \"is_translation_enabled\": false,\n      \"profile_background_color\": \"1A1B1F\",\n      \"profile_background_image_url\": \"http://abs.twimg.com/images/themes/theme1/bg.png\",\n      \"profile_background_image_url_https\": \"https://abs.twimg.com/images/themes/theme1/bg.png\",\n      \"profile_background_tile\": false,\n      \"profile_image_url\": \"http://pbs.twimg.com/profile_images/1161105908480532480/efzfTRsQ_normal.jpg\",\n      \"profile_image_url_https\": \"https://pbs.twimg.com/profile_images/1161105908480532480/efzfTRsQ_normal.jpg\",\n      \"profile_banner_url\": \"https://pbs.twimg.com/profile_banners/25484126/1565664086\",\n      \"profile_image_extensions_alt_text\": null,\n      \"profile_banner_extensions_alt_text\": null,\n      \"profile_link_color\": \"8DAEB8\",\n      \"profile_sidebar_border_color\": \"181A1E\",\n      \"profile_sidebar_fill_color\": \"252429\",\n      \"profile_text_color\": \"666666\",\n      \"profile_use_background_image\": true,\n      \"has_extended_profile\": false,\n      \"default_profile\": false,\n      \"default_profile_image\": false,\n      \"following\": false,\n      \"follow_request_sent\": false,\n      \"notifications\": false,\n      \"translator_type\": \"none\"\n    },\n    \"geo\": null,\n    \"coordinates\": null,\n    \"place\": null,\n    \"contributors\": null,\n    \"is_quote_status\": true,\n    \"quoted_status_id\": 1289359451393155072,\n    \"quoted_status_id_str\": \"1289359451393155072\",\n    \"quoted_status_permalink\": {\n      \"url\": \"https://t.co/dAxlki9Sx4\",\n      \"expanded\": \"https://twitter.com/thehill/status/1289359451393155072\",\n      \"display\": \"twitter.com/thehill/status\\u2026\"\n    },\n    \"quoted_status\": {\n      \"created_at\": \"Sat Aug 01 00:37:03 +0000 2020\",\n      \"id\": 1289359451393155072,\n      \"id_str\": \"1289359451393155072\",\n      \"full_text\": \"Hundreds of kids test positive for coronavirus after one week at sleep-away camp: CDC report https://t.co/noYJadTvvL https://t.co/Q8i0iNmj7e\",\n      \"truncated\": false,\n      \"display_text_range\": [\n        0,\n        116\n      ],\n      \"entities\": {\n        \"hashtags\": [],\n        \"symbols\": [],\n        \"user_mentions\": [],\n        \"urls\": [\n          {\n            \"url\": \"https://t.co/noYJadTvvL\",\n            \"expanded_url\": \"http://hill.cm/tXmNWKj\",\n            \"display_url\": \"hill.cm/tXmNWKj\",\n            \"indices\": [\n              93,\n              116\n            ]\n          }\n        ],\n        \"media\": [\n          {\n            \"id\": 1289359449208107009,\n            \"id_str\": \"1289359449208107009\",\n            \"indices\": [\n              117,\n              140\n            ],\n            \"media_url\": \"http://pbs.twimg.com/media/EeS5lnXXsAEcSMe.png\",\n            \"media_url_https\": \"https://pbs.twimg.com/media/EeS5lnXXsAEcSMe.png\",\n            \"url\": \"https://t.co/Q8i0iNmj7e\",\n            \"display_url\": \"pic.twitter.com/Q8i0iNmj7e\",\n            \"expanded_url\": \"https://twitter.com/thehill/status/1289359451393155072/photo/1\",\n            \"type\": \"photo\",\n            \"sizes\": {\n              \"medium\": {\n                \"w\": 640,\n                \"h\": 360,\n                \"resize\": \"fit\"\n              },\n              \"small\": {\n                \"w\": 640,\n                \"h\": 360,\n                \"resize\": \"fit\"\n              },\n              \"thumb\": {\n                \"w\": 150,\n                \"h\": 150,\n                \"resize\": \"crop\"\n              },\n              \"large\": {\n                \"w\": 640,\n                \"h\": 360,\n                \"resize\": \"fit\"\n              }\n            }\n          }\n        ]\n      },\n      \"extended_entities\": {\n        \"media\": [\n          {\n            \"id\": 1289359449208107009,\n            \"id_str\": \"1289359449208107009\",\n            \"indices\": [\n              117,\n              140\n            ],\n            \"media_url\": \"http://pbs.twimg.com/media/EeS5lnXXsAEcSMe.png\",\n            \"media_url_https\": \"https://pbs.twimg.com/media/EeS5lnXXsAEcSMe.png\",\n            \"url\": \"https://t.co/Q8i0iNmj7e\",\n            \"display_url\": \"pic.twitter.com/Q8i0iNmj7e\",\n            \"expanded_url\": \"https://twitter.com/thehill/status/1289359451393155072/photo/1\",\n            \"type\": \"photo\",\n            \"sizes\": {\n              \"medium\": {\n                \"w\": 640,\n                \"h\": 360,\n                \"resize\": \"fit\"\n              },\n              \"small\": {\n                \"w\": 640,\n                \"h\": 360,\n                \"resize\": \"fit\"\n              },\n              \"thumb\": {\n                \"w\": 150,\n                \"h\": 150,\n                \"resize\": \"crop\"\n              },\n              \"large\": {\n                \"w\": 640,\n                \"h\": 360,\n                \"resize\": \"fit\"\n              }\n            },\n            \"ext_alt_text\": null\n          }\n        ]\n      },\n      \"source\": \"<a href=\\\"http://www.socialflow.com\\\" rel=\\\"nofollow\\\">SocialFlow</a>\",\n      \"in_reply_to_status_id\": null,\n      \"in_reply_to_status_id_str\": null,\n      \"in_reply_to_user_id\": null,\n      \"in_reply_to_user_id_str\": null,\n      \"in_reply_to_screen_name\": null,\n      \"user\": {\n        \"id\": 1917731,\n        \"id_str\": \"1917731\",\n        \"name\": \"The Hill\",\n        \"screen_name\": \"thehill\",\n        \"location\": \"Washington, DC\",\n        \"description\": \"The Hill is the premier source for policy and political news. Follow for tweets on what's happening in Washington, breaking news and retweets of our reporters.\",\n        \"url\": \"http://t.co/t414UtTRv4\",\n        \"entities\": {\n          \"url\": {\n            \"urls\": [\n              {\n                \"url\": \"http://t.co/t414UtTRv4\",\n                \"expanded_url\": \"http://www.thehill.com\",\n                \"display_url\": \"thehill.com\",\n                \"indices\": [\n                  0,\n                  22\n                ]\n              }\n            ]\n          },\n          \"description\": {\n            \"urls\": []\n          }\n        },\n        \"protected\": false,\n        \"followers_count\": 3947104,\n        \"friends_count\": 267,\n        \"listed_count\": 26704,\n        \"created_at\": \"Thu Mar 22 18:15:18 +0000 2007\",\n        \"favourites_count\": 10,\n        \"utc_offset\": null,\n        \"time_zone\": null,\n        \"geo_enabled\": false,\n        \"verified\": true,\n        \"statuses_count\": 781422,\n        \"lang\": null,\n        \"contributors_enabled\": false,\n        \"is_translator\": false,\n        \"is_translation_enabled\": false,\n        \"profile_background_color\": \"9AE4E8\",\n        \"profile_background_image_url\": \"http://abs.twimg.com/images/themes/theme1/bg.png\",\n        \"profile_background_image_url_https\": \"https://abs.twimg.com/images/themes/theme1/bg.png\",\n        \"profile_background_tile\": true,\n        \"profile_image_url\": \"http://pbs.twimg.com/profile_images/907330975587336193/tw7JPE5v_normal.jpg\",\n        \"profile_image_url_https\": \"https://pbs.twimg.com/profile_images/907330975587336193/tw7JPE5v_normal.jpg\",\n        \"profile_banner_url\": \"https://pbs.twimg.com/profile_banners/1917731/1434034905\",\n        \"profile_image_extensions_alt_text\": null,\n        \"profile_banner_extensions_alt_text\": null,\n        \"profile_link_color\": \"FF0021\",\n        \"profile_sidebar_border_color\": \"ADADAA\",\n        \"profile_sidebar_fill_color\": \"EBEBEB\",\n        \"profile_text_color\": \"000000\",\n        \"profile_use_background_image\": true,\n        \"has_extended_profile\": false,\n        \"default_profile\": false,\n        \"default_profile_image\": false,\n        \"following\": false,\n        \"follow_request_sent\": false,\n        \"notifications\": false,\n        \"translator_type\": \"none\"\n      },\n      \"geo\": null,\n      \"coordinates\": null,\n      \"place\": null,\n      \"contributors\": null,\n      \"is_quote_status\": false,\n      \"retweet_count\": 127,\n      \"favorite_count\": 132,\n      \"favorited\": false,\n      \"retweeted\": false,\n      \"possibly_sensitive\": false,\n      \"lang\": \"en\"\n    },\n    \"retweet_count\": 367,\n    \"favorite_count\": 951,\n    \"favorited\": false,\n    \"retweeted\": false,\n    \"possibly_sensitive\": false,\n    \"lang\": \"en\"\n  },\n  \"is_quote_status\": true,\n  \"quoted_status_id\": 1289359451393155072,\n  \"quoted_status_id_str\": \"1289359451393155072\",\n  \"quoted_status_permalink\": {\n    \"url\": \"https://t.co/dAxlki9Sx4\",\n    \"expanded\": \"https://twitter.com/thehill/status/1289359451393155072\",\n    \"display\": \"twitter.com/thehill/status\\u2026\"\n  },\n  \"retweet_count\": 367,\n  \"favorite_count\": 0,\n  \"favorited\": false,\n  \"retweeted\": false,\n  \"lang\": \"en\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:9200/tweets/_doc",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "9200",
+					"path": [
+						"tweets",
+						"_doc"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "PUST Tweets in Bulk",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{ \"index\": { } }\n{\"id\":\"1289380359356874752\",\"content\":\"#Coronavirus El Ministerio de Energía y Minas anunció que el bono electricidad será aplicado a partir de la facturación de agosto ► https://t.co/AGgYd75jyv https://t.co/hZ7bM9Fg8P\",\"location\":null,\"retweet_count\":3,\"favorite_count\":3,\"happened_at\":\"Sat Aug 01 02:00:07 +0000 2020\",\"author\":{\"id\":248692867,\"screen_name\":\"canalN_\",\"name\":\"Canal N\",\"description\":\"#CanalN Todas las noticias, siempre.\\nFB: https://t.co/UMOntgedFI \\nIG: https://t.co/FsyZuU8JDR\",\"followers_count\":10489,\"friends_count\":520,\"statuses_count\":155868},\"country\":null,\"hashtags\":[\"Coronavirus\"],\"mentions\":null,\"parent_id\":null}\n"
+				},
+				"url": {
+					"raw": "http://localhost:9200/tweets/_bulk",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "9200",
+					"path": [
+						"tweets",
+						"_bulk"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"protocolProfileBehavior": {}
+}

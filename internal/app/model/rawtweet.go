@@ -1,4 +1,4 @@
-package utils
+package model
 
 // RawTweet interface generated with https://mholt.github.io/json-to-go/
 type RawTweet struct {

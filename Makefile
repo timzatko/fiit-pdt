@@ -14,6 +14,9 @@ lint-fix:
 db-seed:
 	go run cmd/populatedb/main.go
 
+to-elastic:
+	go run cmd/toelastic/main.go
+
 db-migrate-up:
 	migrate -database "postgres://${PDT_DATABASE_USER}:${PDT_DATABASE_PASSWORD}@localhost:5432/${PDT_DATABASE_DB}?sslmode=disable" -path db/migrations up
 

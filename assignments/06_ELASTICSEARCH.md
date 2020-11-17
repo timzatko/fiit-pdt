@@ -17,7 +17,6 @@ Keďže sa preklápame do času, kde toho začína byť veľa aj z pohľadu osta
 6. Experimentujte s nódami, a zistite koľko nódov musí bežať (a ktoré) aby vám Elasticsearch vedel pridávať dokumenty, mazať dokumenty, prezerať dokumenty a vyhľadávať nad nimi?
 7. Upravujte počet retweetov pre vami vybraný tweet pomocou vašeho jednoduchého
 scriptu (v rámci Elasticsearchu) a sledujte ako sa mení _seq_no a_primary_term pri tom ako zabíjate a spúšťate nódy.
-Hodnotenie
 
 ### Hodnotenie
 
