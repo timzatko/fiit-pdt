@@ -217,7 +217,7 @@ func (q *Queue) process(rts []model.RawTweet, batchId int) {
 			fmt.Printf("failed to unmarshall: %v\n", err)
 		}
 
-		if rBody.Errors == true {
+		if rBody.Errors {
 			fmt.Printf("bulk failed: %v\n", rBody.Items)
 		}
 	} else {
