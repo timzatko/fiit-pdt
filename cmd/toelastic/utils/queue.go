@@ -41,7 +41,7 @@ type Mention struct {
 }
 
 type Tweet struct {
-	Id            string    `json:"id"`
+	Id            string    `json:"_id"`
 	Content       string    `json:"content"`
 	Location      *Location `json:"location"`
 	RetweetCount  int64     `json:"retweet_count"`
