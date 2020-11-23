@@ -2,5 +2,5 @@
 
 curl --header "Content-Type: application/json" \
   --request PUT \
-  --data "$(cat tweets/mapping.json)" \
-  http://localhost:9200/tweets/_mapping
+  --data "$(cat "$(dirname "$0")/tweets/index.json")" \
+  http://localhost:9200/tweets
