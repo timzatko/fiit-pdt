@@ -34,3 +34,9 @@ db-migrate-down:
 
 db-migrate-drop:
 	migrate -database "postgres://${PDT_DATABASE_USER}:${PDT_DATABASE_PASSWORD}@localhost:5432/${PDT_DATABASE_DB}?sslmode=disable" -path db/migrations drop
+
+elastic-tweets-put-index:
+	sh ./elastic/scripts/index.sh
+
+elastic-tweets-put-mapping:
+	sh ./elastic/scripts/mapping.sh

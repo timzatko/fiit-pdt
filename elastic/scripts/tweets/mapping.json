@@ -1,0 +1,77 @@
+{
+  "dynamic": "strict",
+  "properties": {
+    "id": {
+      "type": "text"
+    },
+    "content": {
+      "type": "text"
+    },
+    "location": {
+      "type": "geo_point"
+    },
+    "retweet_count": {
+      "type": "integer"
+    },
+    "favorite_count": {
+      "type": "integer"
+    },
+    "happened_at": {
+      "type": "date"
+    },
+    "author": {
+      "properties": {
+        "id": {
+          "type": "long"
+        },
+        "screen_name": {
+          "type": "text"
+        },
+        "name": {
+          "type": "text"
+        },
+        "description": {
+          "type": "text"
+        },
+        "followers_count": {
+          "type": "integer"
+        },
+        "friends_count": {
+          "type": "integer"
+        },
+        "statuses_count": {
+          "type": "integer"
+        }
+      }
+    },
+    "country": {
+      "properties": {
+        "code": {
+          "type": "keyword"
+        },
+        "name": {
+          "type": "text"
+        }
+      }
+    },
+    "hashtags": {
+      "type": "text"
+    },
+    "mentions": {
+      "properties": {
+        "id": {
+          "type": "long"
+        },
+        "screen_name": {
+          "type": "text"
+        },
+        "name": {
+          "type": "text"
+        }
+      }
+    },
+    "parent_id": {
+      "type": "text"
+    }
+  }
+}
