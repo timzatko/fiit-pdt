@@ -41,7 +41,6 @@ type Mention struct {
 }
 
 type Tweet struct {
-	Id            string    `json:"_id"`
 	Content       string    `json:"content"`
 	Location      *Location `json:"location"`
 	RetweetCount  int64     `json:"retweet_count"`
@@ -165,7 +164,6 @@ func (q *Queue) process(rts []model.RawTweet, batchId int) {
 		}
 
 		tw := Tweet{
-			Id:            rt.IDStr,
 			Content:       rt.FullText,
 			RetweetCount:  rt.RetweetCount,
 			FavoriteCount: rt.FavoriteCount,
@@ -184,7 +182,7 @@ func (q *Queue) process(rts []model.RawTweet, batchId int) {
 			continue
 		}
 
-		cmd = append(cmd, `{ "index": { } }`, string(b))
+		cmd = append(cmd, fmt.Sprintf(`{ "index": { "_id": "%s" } }`, rt.IDStr), string(b))
 	}
 
 	var body string

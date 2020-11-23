@@ -1,9 +1,6 @@
 {
   "dynamic": "strict",
   "properties": {
-    "id": {
-      "type": "text"
-    },
     "content": {
       "type": "text"
     },
