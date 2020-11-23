@@ -212,7 +212,7 @@ func (q *Queue) process(rts []model.RawTweet, batchId int) {
 	var rBodyBytes []byte
 	rBodyBytes, err = ioutil.ReadAll(r.Body)
 	if err != nil {
-		fmt.Printf("failed to read all: %v\n", err)
+		fmt.Printf("bulk #%d failed to read all: %v\n", batchId, err)
 		return
 	}
 
@@ -220,15 +220,15 @@ func (q *Queue) process(rts []model.RawTweet, batchId int) {
 		var rBody Response
 		err = json.Unmarshal(rBodyBytes, &rBody)
 		if err != nil {
-			fmt.Printf("failed to unmarshall: %v\n", err)
+			fmt.Printf("bulk #%d failed to unmarshall: %v\n", batchId, err)
 			return
 		}
 		if rBody.Errors {
-			fmt.Printf("bulk failed: %v\n", rBody.Items)
+			fmt.Printf("bulk #%d failed: %v\n", batchId, rBody.Items)
 			return
 		}
 	} else {
-		fmt.Printf("bulk failed with status=%d: %v\n", r.StatusCode, rBodyBytes)
+		fmt.Printf("bulk #%d failed with status=%d: %v\n", batchId, r.StatusCode, rBodyBytes)
 		return
 	}
 }
