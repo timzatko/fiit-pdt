@@ -24,7 +24,7 @@ func (c Constructor) NewQueue(logLevel int) reader.Queue {
 
 func main() {
 	logLevel := 0
-	maxSize := 2500
+	maxSize := 5000
 
 	ctx := context.TODO()
 	sync := synchronizer.NewSynchronizer(ctx, 4)

@@ -12,6 +12,7 @@ import (
 	"github.com/timzatko/fiit-pdt/internal/app/model"
 	"github.com/timzatko/fiit-pdt/internal/reader"
 	"github.com/timzatko/fiit-pdt/internal/synchronizer"
+	"github.com/timzatko/fiit-pdt/internal/timer"
 )
 
 type Location struct {
@@ -112,6 +113,10 @@ func (q *Queue) Enqueue(rt *model.RawTweet) {
 
 func (q *Queue) process(rts []model.RawTweet, batchId int) {
 	defer q.sync.Release()
+
+	if q.logLevel <= 1 {
+		defer timer.Duration(timer.Track(fmt.Sprintf("batch %d processed!", batchId)))
+	}
 
 	var cmd []string
 
@@ -225,10 +230,6 @@ func (q *Queue) process(rts []model.RawTweet, batchId int) {
 	} else {
 		fmt.Printf("bulk failed with status=%d: %v\n", r.StatusCode, rBodyBytes)
 		return
-	}
-
-	if q.logLevel <= 1 {
-		fmt.Printf("batch #%d request sent...\n", batchId)
 	}
 }
 
