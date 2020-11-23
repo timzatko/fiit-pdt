@@ -202,12 +202,15 @@ func (q *Queue) process(rts []model.RawTweet, batchId int) {
 	r, err = q.http.Do(req)
 	if err != nil {
 		fmt.Printf("failed to do request for batch #%d: %v\n", batchId, err)
+		return
 	}
+	defer func() { _ = r.Body.Close() }()
 
 	var rBodyBytes []byte
 	rBodyBytes, err = ioutil.ReadAll(r.Body)
 	if err != nil {
 		fmt.Printf("failed to read all: %v\n", err)
+		return
 	}
 
 	if r.StatusCode == 200 {
@@ -215,16 +218,16 @@ func (q *Queue) process(rts []model.RawTweet, batchId int) {
 		err = json.Unmarshal(rBodyBytes, &rBody)
 		if err != nil {
 			fmt.Printf("failed to unmarshall: %v\n", err)
+			return
 		}
-
 		if rBody.Errors {
 			fmt.Printf("bulk failed: %v\n", rBody.Items)
+			return
 		}
 	} else {
 		fmt.Printf("bulk failed with status=%d: %v\n", r.StatusCode, rBodyBytes)
+		return
 	}
-
-	_ = r.Body.Close()
 
 	if q.logLevel <= 1 {
 		fmt.Printf("batch #%d request sent...\n", batchId)
