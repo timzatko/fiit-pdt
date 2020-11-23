@@ -228,7 +228,7 @@ func (q *Queue) process(rts []model.RawTweet, batchId int) {
 			return
 		}
 	} else {
-		fmt.Printf("bulk #%d failed with status=%d: %v\n", batchId, r.StatusCode, rBodyBytes)
+		fmt.Printf("bulk #%d failed with status=%d: %v\n", batchId, r.StatusCode, string(rBodyBytes))
 		return
 	}
 }
