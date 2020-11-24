@@ -68,7 +68,7 @@
       }
     },
     "parent_id": {
-      "type": "text"
+      "type": "keyword"
     }
   }
 }
