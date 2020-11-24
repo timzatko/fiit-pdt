@@ -268,7 +268,7 @@ Keď som mal jeden žijúci node (nie master), mazanie a pridávanie odpovedalo 
 
 Master node som zistil pomocou nasledovného príkazu - **GET** `http://localhost:9200/_cat/master`.  
 
-### 7. Upravujte počet retweetov pre vami vybraný tweet pomocou vašeho jednoduchého scriptu (v rámci Elasticsearchu) a sledujte ako sa mení _seq_no a_primary_term pri tom ako zabíjate a spúšťate nódy.
+### 7. Upravujte počet retweetov pre vami vybraný tweet pomocou vašeho jednoduchého scriptu (v rámci Elasticsearchu) a sledujte, ako sa mení seq_no a primary_term pri tom, ako zabíjate a spúšťate nódy.
 
 Vybral som si tweet s `id` = `1289435277660844032`.
 
@@ -283,4 +283,8 @@ Body:
 }
 ```
 
+Po vykonávaní scriptu sa postupne zvyšoval `retweet_count` a aj `seq_no`. Podľa dokumentácie toto číslo značí číslo zmeny na index a používa sa pri konfliktoch zmien nad dokumentom.
+To pomáha tomu aby sa nestalo, že nejaká novšia zmena (vyššie `seq_no`) je prepísaná nejakou staršou zmenou (nižšie `seq_no`)
 
+Číslo `primary_term` sa mi zmenilo po vypnutí a zapnutí niektorých nodov. Podľa dokumentácie toto hodnota primary term hovorí o tom, že ktorý
+shard vyvolal zmenu nad daným dokumentom, taktiež sa používa pri riešení konfliktov. 
