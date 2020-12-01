@@ -2,7 +2,8 @@
   "dynamic": "strict",
   "properties": {
     "content": {
-      "type": "text"
+      "type": "text",
+      "analyzer": "englando"
     },
     "location": {
       "type": "geo_point"
@@ -22,13 +23,36 @@
           "type": "long"
         },
         "screen_name": {
-          "type": "text"
+          "type": "text",
+          "fields": {
+            "ngram": {
+              "type": "text",
+              "analyzer": "custom_ngram"
+            }
+          }
         },
         "name": {
-          "type": "text"
+          "type": "text",
+          "fields": {
+            "shingles": {
+              "type": "text",
+              "analyzer": "custom_shingles"
+            },
+            "ngram": {
+              "type": "text",
+              "analyzer": "custom_ngram"
+            }
+          }
         },
         "description": {
-          "type": "text"
+          "type": "text",
+          "analyzer": "englando",
+          "fields": {
+            "shingles": {
+              "type": "text",
+              "analyzer": "custom_shingles"
+            }
+          }
         },
         "followers_count": {
           "type": "integer"
@@ -60,10 +84,26 @@
           "type": "long"
         },
         "screen_name": {
-          "type": "text"
+          "type": "text",
+          "fields": {
+            "ngram": {
+              "type": "text",
+              "analyzer": "custom_ngram"
+            }
+          }
         },
         "name": {
-          "type": "text"
+          "type": "text",
+          "fields": {
+            "shingles": {
+              "type": "text",
+              "analyzer": "custom_shingles"
+            },
+            "ngram": {
+              "type": "text",
+              "analyzer": "custom_ngram"
+            }
+          }
         }
       }
     },

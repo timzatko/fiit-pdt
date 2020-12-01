@@ -32,5 +32,5 @@ To import data run - `make db-seed`.
 
 1. Navigate to [elastic](./elastic) folder - `cd elastic`
 2. Run the elastic search docker image - `docker-compose up`
-3. Create tweets index and setup mapping - `make elastic-tweets-put-index && elastic-tweets-put-mapping`
+3. Create tweets index and setup mapping - `make elastic-tweets-put-index && make elastic-tweets-put-settings && make elastic-tweets-put-mapping`
 4. Import data - `make to-elastic` (requires tweets in [data](./data) directory)

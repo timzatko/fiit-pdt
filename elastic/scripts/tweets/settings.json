@@ -1,0 +1,69 @@
+{
+  "index": {
+    "max_ngram_diff": 9
+  },
+  "analysis": {
+    "analyzer": {
+      "englando": {
+        "type": "custom",
+        "filter": [
+          "english_possessive_stemmer",
+          "lowercase",
+          "english_stop",
+          "english_stemmer"
+        ],
+        "char_filter": [
+          "html_strip"
+        ],
+        "tokenizer": "standard"
+      },
+      "custom_ngram": {
+        "type": "custom",
+        "filter": [
+          "lowercase",
+          "asciifolding",
+          "filter_ngram"
+        ],
+        "char_filter": [
+          "html_strip"
+        ],
+        "tokenizer": "standard"
+      },
+      "custom_shingles": {
+        "type": "custom",
+        "filter": [
+          "lowercase",
+          "asciifolding",
+          "filter_shingles"
+        ],
+        "char_filter": [
+          "html_strip"
+        ],
+        "tokenizer": "standard"
+      }
+    },
+    "filter": {
+      "filter_ngram": {
+        "type": "ngram",
+        "min_gram": 1,
+        "max_gram": 10
+      },
+      "english_possessive_stemmer": {
+        "type": "stemmer",
+        "language": "possessive_english"
+      },
+      "english_stop": {
+        "type": "stop",
+        "stopwords": "_english_"
+      },
+      "english_stemmer": {
+        "type": "stemmer",
+        "language": "english"
+      },
+      "filter_shingles": {
+        "type": "shingle",
+        "token_separator": ""
+      }
+    }
+  }
+}

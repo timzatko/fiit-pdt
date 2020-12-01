@@ -38,5 +38,8 @@ db-migrate-drop:
 elastic-tweets-put-index:
 	sh ./elastic/scripts/index.sh
 
+elastic-tweets-put-settings:
+	sh ./elastic/scripts/settings.sh
+
 elastic-tweets-put-mapping:
 	sh ./elastic/scripts/mapping.sh

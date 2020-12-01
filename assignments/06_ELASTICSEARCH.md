@@ -2,11 +2,7 @@
 
 **Timotej Zaťko**
 
-## Do kedy?
-
-Keďže sa preklápame do času, kde toho začína byť veľa aj z pohľadu ostatným predmetov a diplomoviek, toto aj ďalšie zadanie (obe sú Elasticsearch) bude mať spoločný čas odovzdania a to je 4.12. 23:59.
-
-## Zadanie č.1 – práca s indexom a dokumentami v Elasticsearch
+## Zadanie: Práca s indexom a dokumentami v Elasticsearch
 
 1. Rozbehajte si 3 inštancie Elasticsearch-u
 2. Vytvorte index pre Tweety, ktorý bude mať “optimálny“ počet shardov a replík pre 3 nody
