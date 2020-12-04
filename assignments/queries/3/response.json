@@ -1,0 +1,549 @@
+{
+  "took": 1322,
+  "timed_out": false,
+  "_shards": {
+    "total": 3,
+    "successful": 3,
+    "skipped": 0,
+    "failed": 0
+  },
+  "hits": {
+    "total": {
+      "value": 10000,
+      "relation": "gte"
+    },
+    "max_score": 0.0,
+    "hits": [
+      {
+        "_index": "tweets",
+        "_type": "_doc",
+        "_id": "1289898292671737856",
+        "_score": 0.0,
+        "_source": {
+          "content": "RT @EC2man: Lunatics or perhaps some really rather unpleasant sinister disingenuous types. Take your pick. Either way, it’s not a good one.…",
+          "location": null,
+          "retweet_count": 2,
+          "favorite_count": 0,
+          "happened_at": 1596370692000,
+          "author": {
+            "id": 1232027761906192385,
+            "screen_name": "MaherRonan",
+            "name": "Ronan Maher",
+            "description": "veritas simplex oratio est",
+            "followers_count": 8637,
+            "friends_count": 966,
+            "statuses_count": 8965
+          },
+          "country": null,
+          "hashtags": null,
+          "mentions": [
+            {
+              "id": 224547829,
+              "screen_name": "EC2man",
+              "name": "Ian"
+            }
+          ],
+          "parent_id": "1289897633490722817"
+        }
+      },
+      {
+        "_index": "tweets",
+        "_type": "_doc",
+        "_id": "1289898292759785472",
+        "_score": 0.0,
+        "_source": {
+          "content": "RT @deanofdublin: Trump has been president for 3 yrs, 194 days, 12 hrs, 06 mins &amp; 38 secs.\n\nSince @realDonaldTrump took office:\n\n🔻Over 157K…",
+          "location": null,
+          "retweet_count": 368,
+          "favorite_count": 0,
+          "happened_at": 1596370692000,
+          "author": {
+            "id": 23589004,
+            "screen_name": "KMillerLiu",
+            "name": "Kathleen Miller Liu",
+            "description": "Vote",
+            "followers_count": 30446,
+            "friends_count": 1198,
+            "statuses_count": 15787
+          },
+          "country": null,
+          "hashtags": null,
+          "mentions": [
+            {
+              "id": 2302362158,
+              "screen_name": "deanofdublin",
+              "name": "Dean Wallace 🗳🗽"
+            },
+            {
+              "id": 25073877,
+              "screen_name": "realDonaldTrump",
+              "name": "Donald J. Trump"
+            }
+          ],
+          "parent_id": "1289789644817592321"
+        }
+      },
+      {
+        "_index": "tweets",
+        "_type": "_doc",
+        "_id": "1289898293116379136",
+        "_score": 0.0,
+        "_source": {
+          "content": "RT @AohadaPeach: white people when the retail worker tells them they have to wear a mask",
+          "location": null,
+          "retweet_count": 107859,
+          "favorite_count": 0,
+          "happened_at": 1596370692000,
+          "author": {
+            "id": 787895235078606852,
+            "screen_name": "petittaemi",
+            "name": "criminal soty",
+            "description": "love island fan account",
+            "followers_count": 18358,
+            "friends_count": 123,
+            "statuses_count": 20875
+          },
+          "country": null,
+          "hashtags": null,
+          "mentions": [
+            {
+              "id": 2377480484,
+              "screen_name": "AohadaPeach",
+              "name": "Aohada"
+            }
+          ],
+          "parent_id": "1289796499644137472"
+        }
+      },
+      {
+        "_index": "tweets",
+        "_type": "_doc",
+        "_id": "1289849293604450304",
+        "_score": 0.0,
+        "_source": {
+          "content": "Es muy raro que todos hablen de los rebrotes en Catalunya y nadie diga nada de los recortes en la sanidad madrileña...\n\nEste es el verdadero problema del #Covid_19 👇\nhttps://t.co/Sr3pULL8rM",
+          "location": null,
+          "retweet_count": 16,
+          "favorite_count": 14,
+          "happened_at": 1596359010000,
+          "author": {
+            "id": 3064934325,
+            "screen_name": "AuditaSanidad",
+            "name": "Audita Sanidad",
+            "description": "Grupo de Trabajo para una Auditoría Ciudadana de la Deuda en Sanidad",
+            "followers_count": 6920,
+            "friends_count": 4888,
+            "statuses_count": 13416
+          },
+          "country": null,
+          "hashtags": [
+            "Covid_19"
+          ],
+          "mentions": null,
+          "parent_id": null
+        }
+      },
+      {
+        "_index": "tweets",
+        "_type": "_doc",
+        "_id": "1289898293200187392",
+        "_score": 0.0,
+        "_source": {
+          "content": "RT @AuditaSanidad: Es muy raro que todos hablen de los rebrotes en Catalunya y nadie diga nada de los recortes en la sanidad madrileña...…",
+          "location": null,
+          "retweet_count": 16,
+          "favorite_count": 0,
+          "happened_at": 1596370692000,
+          "author": {
+            "id": 1176646686,
+            "screen_name": "GrupDeuteLH",
+            "name": "GrupDeuteLH",
+            "description": "Vam ser iniciativa de l'Assemblea #15M d l'Hospitalet d Llobregat.Nostre objectiu és informar xq #NoDevemNoPaguem, recolzant la feina de @Cooperactivists 😉#LH",
+            "followers_count": 36491,
+            "friends_count": 8363,
+            "statuses_count": 61039
+          },
+          "country": null,
+          "hashtags": null,
+          "mentions": [
+            {
+              "id": 3064934325,
+              "screen_name": "AuditaSanidad",
+              "name": "Audita Sanidad"
+            }
+          ],
+          "parent_id": "1289849293604450304"
+        }
+      },
+      {
+        "_index": "tweets",
+        "_type": "_doc",
+        "_id": "1289898293540118534",
+        "_score": 0.0,
+        "_source": {
+          "content": "RT @zorinaq: I made a bar chart of COVID-19 deaths in Florida by exact date of death. I took care of choosing just the right coloring to em…",
+          "location": null,
+          "retweet_count": 229,
+          "favorite_count": 0,
+          "happened_at": 1596370692000,
+          "author": {
+            "id": 333151846,
+            "screen_name": "NIUHuskieJohn",
+            "name": "HuskieJohn🇮🇪🇮🇹🇭🇺🇺🇸",
+            "description": "I see you, I hear you, I support you & I am sorry it took this long to stand with you. #BlackLivesMatter",
+            "followers_count": 38535,
+            "friends_count": 218,
+            "statuses_count": 30064
+          },
+          "country": null,
+          "hashtags": null,
+          "mentions": [
+            {
+              "id": 247161834,
+              "screen_name": "zorinaq",
+              "name": "Beͫvͣaͬnͨd"
+            }
+          ],
+          "parent_id": "1289664673176944640"
+        }
+      },
+      {
+        "_index": "tweets",
+        "_type": "_doc",
+        "_id": "1289898294404030466",
+        "_score": 0.0,
+        "_source": {
+          "content": "RT @bestblackvids: This isn’t social distancing https://t.co/2anE6iFOfH",
+          "location": null,
+          "retweet_count": 229,
+          "favorite_count": 0,
+          "happened_at": 1596370693000,
+          "author": {
+            "id": 954410380712906752,
+            "screen_name": "lit_the_tit",
+            "name": "STONEy",
+            "description": "DM for submissions/Removal",
+            "followers_count": 41,
+            "friends_count": 199,
+            "statuses_count": 113
+          },
+          "country": null,
+          "hashtags": null,
+          "mentions": [
+            {
+              "id": 707889041002401793,
+              "screen_name": "bestblackvids",
+              "name": "BEST BLACK VIDS 🍫💦"
+            }
+          ],
+          "parent_id": "1289643482470944768"
+        }
+      },
+      {
+        "_index": "tweets",
+        "_type": "_doc",
+        "_id": "1289775655467409408",
+        "_score": 0.0,
+        "_source": {
+          "content": "#02Ago Todos estamos tan expuestos al virus, que no se qué cucaracha tienen aquellos que dicen: \" ese Coronavirus es mentira, es porque no hay gasolina\", sino valoran sus vidas, respeten las de otros que estamos trabajando en medio de una pandemia. #SeanConscientes Médicos https://t.co/LtQCmsePO5",
+          "location": null,
+          "retweet_count": 11,
+          "favorite_count": 9,
+          "happened_at": 1596341453000,
+          "author": {
+            "id": 1249692408989855747,
+            "screen_name": "ingmaryrodrigu1",
+            "name": "Ingmary Rodríguez Parejo",
+            "description": "Periodista venezolana 🇻🇪\n📍Táchira- Lara\nActiva en: \n @las_primicias \n @TachiraNoticias \n\n\n\n\nPremio Regional de Periodismo Lara 2017\nNueva Cuenta",
+            "followers_count": 5105,
+            "friends_count": 296,
+            "statuses_count": 1088
+          },
+          "country": null,
+          "hashtags": [
+            "02Ago",
+            "SeanConscientes"
+          ],
+          "mentions": null,
+          "parent_id": null
+        }
+      },
+      {
+        "_index": "tweets",
+        "_type": "_doc",
+        "_id": "1289898295146328066",
+        "_score": 0.0,
+        "_source": {
+          "content": "RT @I_am_impartial: #HRDPostponeJEE_NEET https://t.co/T7anY0pRba",
+          "location": null,
+          "retweet_count": 1,
+          "favorite_count": 0,
+          "happened_at": 1596370693000,
+          "author": {
+            "id": 1274738076149878784,
+            "screen_name": "Indrajitsuryav9",
+            "name": "Indrajit suryavanshi",
+            "description": "",
+            "followers_count": 2337,
+            "friends_count": 138,
+            "statuses_count": 1384
+          },
+          "country": null,
+          "hashtags": [
+            "HRDPostponeJEE_NEET"
+          ],
+          "mentions": [
+            {
+              "id": 1175432236536975360,
+              "screen_name": "I_am_impartial",
+              "name": "Muktesh Jaiswal"
+            }
+          ],
+          "parent_id": "1289898125784518662"
+        }
+      },
+      {
+        "_index": "tweets",
+        "_type": "_doc",
+        "_id": "1289755987587395584",
+        "_score": 0.0,
+        "_source": {
+          "content": "I'm of the view that Amateurism is utterly incompatible with a Covid-19 world.  A business relationship b/w labor and management is needed to navigate the difficulties of keeping safe in a pandemic.  Being amateur is inherently unsafe and just magnifies the exploitation.",
+          "location": null,
+          "retweet_count": 34,
+          "favorite_count": 120,
+          "happened_at": 1596336764000,
+          "author": {
+            "id": 18255672,
+            "screen_name": "andyhre",
+            "name": "Andy Schwarz",
+            "description": "Economist, specializing in antitrust & damages & sport economics. Opinions my own. My firm:https://t.co/PFxpSdL0NI.  Spreading the word about https://t.co/dEt09PSyVJ",
+            "followers_count": 1927,
+            "friends_count": 2347,
+            "statuses_count": 26734
+          },
+          "country": null,
+          "hashtags": null,
+          "mentions": null,
+          "parent_id": null
+        }
+      }
+    ]
+  },
+  "aggregations": {
+    "august_days": {
+      "buckets": [
+        {
+          "key_as_string": "2020-08-01",
+          "key": 1596240000000,
+          "doc_count": 1327513,
+          "supporters": {
+            "buckets": {
+              "bidenist": {
+                "doc_count": 486,
+                "retweet_sum": {
+                  "value": 1598244.0
+                }
+              },
+              "trumpist": {
+                "doc_count": 1249,
+                "retweet_sum": {
+                  "value": 6185419.0
+                }
+              }
+            }
+          }
+        },
+        {
+          "key_as_string": "2020-08-02",
+          "key": 1596326400000,
+          "doc_count": 531051,
+          "supporters": {
+            "buckets": {
+              "bidenist": {
+                "doc_count": 197,
+                "retweet_sum": {
+                  "value": 793057.0
+                }
+              },
+              "trumpist": {
+                "doc_count": 543,
+                "retweet_sum": {
+                  "value": 2755795.0
+                }
+              }
+            }
+          }
+        },
+        {
+          "key_as_string": "2020-08-03",
+          "key": 1596412800000,
+          "doc_count": 536268,
+          "supporters": {
+            "buckets": {
+              "bidenist": {
+                "doc_count": 215,
+                "retweet_sum": {
+                  "value": 811701.0
+                }
+              },
+              "trumpist": {
+                "doc_count": 517,
+                "retweet_sum": {
+                  "value": 2784705.0
+                }
+              }
+            }
+          }
+        },
+        {
+          "key_as_string": "2020-08-04",
+          "key": 1596499200000,
+          "doc_count": 1200860,
+          "supporters": {
+            "buckets": {
+              "bidenist": {
+                "doc_count": 555,
+                "retweet_sum": {
+                  "value": 1399880.0
+                }
+              },
+              "trumpist": {
+                "doc_count": 1075,
+                "retweet_sum": {
+                  "value": 4338664.0
+                }
+              }
+            }
+          }
+        },
+        {
+          "key_as_string": "2020-08-05",
+          "key": 1596585600000,
+          "doc_count": 991140,
+          "supporters": {
+            "buckets": {
+              "bidenist": {
+                "doc_count": 325,
+                "retweet_sum": {
+                  "value": 1766774.0
+                }
+              },
+              "trumpist": {
+                "doc_count": 733,
+                "retweet_sum": {
+                  "value": 4151682.0
+                }
+              }
+            }
+          }
+        },
+        {
+          "key_as_string": "2020-08-06",
+          "key": 1596672000000,
+          "doc_count": 510709,
+          "supporters": {
+            "buckets": {
+              "bidenist": {
+                "doc_count": 216,
+                "retweet_sum": {
+                  "value": 798511.0
+                }
+              },
+              "trumpist": {
+                "doc_count": 400,
+                "retweet_sum": {
+                  "value": 1371427.0
+                }
+              }
+            }
+          }
+        },
+        {
+          "key_as_string": "2020-08-07",
+          "key": 1596758400000,
+          "doc_count": 376438,
+          "supporters": {
+            "buckets": {
+              "bidenist": {
+                "doc_count": 197,
+                "retweet_sum": {
+                  "value": 602131.0
+                }
+              },
+              "trumpist": {
+                "doc_count": 415,
+                "retweet_sum": {
+                  "value": 3904162.0
+                }
+              }
+            }
+          }
+        },
+        {
+          "key_as_string": "2020-08-08",
+          "key": 1596844800000,
+          "doc_count": 531053,
+          "supporters": {
+            "buckets": {
+              "bidenist": {
+                "doc_count": 219,
+                "retweet_sum": {
+                  "value": 813593.0
+                }
+              },
+              "trumpist": {
+                "doc_count": 603,
+                "retweet_sum": {
+                  "value": 2208935.0
+                }
+              }
+            }
+          }
+        },
+        {
+          "key_as_string": "2020-08-09",
+          "key": 1596931200000,
+          "doc_count": 705989,
+          "supporters": {
+            "buckets": {
+              "bidenist": {
+                "doc_count": 312,
+                "retweet_sum": {
+                  "value": 772199.0
+                }
+              },
+              "trumpist": {
+                "doc_count": 657,
+                "retweet_sum": {
+                  "value": 2717973.0
+                }
+              }
+            }
+          }
+        },
+        {
+          "key_as_string": "2020-08-10",
+          "key": 1597017600000,
+          "doc_count": 161526,
+          "supporters": {
+            "buckets": {
+              "bidenist": {
+                "doc_count": 65,
+                "retweet_sum": {
+                  "value": 474138.0
+                }
+              },
+              "trumpist": {
+                "doc_count": 133,
+                "retweet_sum": {
+                  "value": 1090241.0
+                }
+              }
+            }
+          }
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,378 @@
+{
+  "took": 19492,
+  "timed_out": false,
+  "_shards": {
+    "total": 3,
+    "successful": 3,
+    "skipped": 0,
+    "failed": 0
+  },
+  "hits": {
+    "total": {
+      "value": 10000,
+      "relation": "gte"
+    },
+    "max_score": 1620.0437,
+    "hits": [
+      {
+        "_index": "tweets",
+        "_type": "_doc",
+        "_id": "1288063900567699458",
+        "_score": 1620.0437,
+        "_source": {
+          "content": "#COVID19: Hydroxychloroquine, Zinc and Zithromax, yet some are still waiting for Bill Gates and Fauci vaccine.",
+          "location": null,
+          "retweet_count": 257,
+          "favorite_count": 704,
+          "happened_at": 1595933339000,
+          "author": {
+            "id": 59755457,
+            "screen_name": "ayemojubar",
+            "name": "Ayemojubar 👠",
+            "description": "I'm not here to be liked. I can be the best thing that happens to you on this street, I can also be your worst nightmare. Member of the #4thArmOfGovt🎗️.",
+            "followers_count": 124518,
+            "friends_count": 35283,
+            "statuses_count": 110651
+          },
+          "country": null,
+          "hashtags": [
+            "COVID19"
+          ],
+          "mentions": null,
+          "parent_id": null
+        }
+      },
+      {
+        "_index": "tweets",
+        "_type": "_doc",
+        "_id": "1290583710451019778",
+        "_score": 1549.105,
+        "_source": {
+          "content": "RT @ayemojubar: #COVID19: Hydroxychloroquine, Zinc and Zithromax, yet some are still waiting for Bill Gates and Fauci vaccine.",
+          "location": null,
+          "retweet_count": 257,
+          "favorite_count": 0,
+          "happened_at": 1596534109000,
+          "author": {
+            "id": 1476865112,
+            "screen_name": "Dadycool09",
+            "name": "Malam Basharu✈️",
+            "description": "Private Pilot NR. Fmr. assistant class Captain. .Future Airline Captain.. #Pilot #Avgeek #FCB Flying🐝",
+            "followers_count": 12702,
+            "friends_count": 644,
+            "statuses_count": 14083
+          },
+          "country": null,
+          "hashtags": [
+            "COVID19"
+          ],
+          "mentions": [
+            {
+              "id": 59755457,
+              "screen_name": "ayemojubar",
+              "name": "Ayemojubar 👠"
+            }
+          ],
+          "parent_id": "1288063900567699458"
+        }
+      },
+      {
+        "_index": "tweets",
+        "_type": "_doc",
+        "_id": "1286939144971845632",
+        "_score": 1546.7308,
+        "_source": {
+          "content": "So the world Corona Death Rate WITHOUT a vaccine\n\nIs still lower than the flu WITH a vaccine\n\n#endlockdownuk \n#COVID19\n#nomasks",
+          "location": null,
+          "retweet_count": 134,
+          "favorite_count": 295,
+          "happened_at": 1595665176000,
+          "author": {
+            "id": 1245256502518177792,
+            "screen_name": "CoronaDoubter",
+            "name": "End-The-Lockdown #NoMasks",
+            "description": "The government strategy is like trying to kill a fly in your living room by burning down the whole house 🇬🇧☕️🐶🐩😎🥂🏖🗽",
+            "followers_count": 3923,
+            "friends_count": 3927,
+            "statuses_count": 2475
+          },
+          "country": null,
+          "hashtags": [
+            "endlockdownuk",
+            "COVID19",
+            "nomasks"
+          ],
+          "mentions": null,
+          "parent_id": null
+        }
+      },
+      {
+        "_index": "tweets",
+        "_type": "_doc",
+        "_id": "1290135851414859776",
+        "_score": 1518.9565,
+        "_source": {
+          "content": "RT @CoronaDoubter: So the world Corona Death Rate WITHOUT a vaccine\n\nIs still lower than the flu WITH a vaccine\n\n#endlockdownuk \n#COVID19\n#…",
+          "location": null,
+          "retweet_count": 134,
+          "favorite_count": 0,
+          "happened_at": 1596427331000,
+          "author": {
+            "id": 2869975106,
+            "screen_name": "MindYourPs_Qs1",
+            "name": "🇺🇸 Brooke 🇺🇸",
+            "description": "",
+            "followers_count": 33337,
+            "friends_count": 823,
+            "statuses_count": 30410
+          },
+          "country": null,
+          "hashtags": [
+            "endlockdownuk",
+            "COVID19"
+          ],
+          "mentions": [
+            {
+              "id": 1245256502518177792,
+              "screen_name": "CoronaDoubter",
+              "name": "End-The-Lockdown #NoMasks"
+            }
+          ],
+          "parent_id": "1286939144971845632"
+        }
+      },
+      {
+        "_index": "tweets",
+        "_type": "_doc",
+        "_id": "1290135659227709440",
+        "_score": 1517.3374,
+        "_source": {
+          "content": "RT @CoronaDoubter: So the world Corona Death Rate WITHOUT a vaccine\n\nIs still lower than the flu WITH a vaccine\n\n#endlockdownuk \n#COVID19\n#…",
+          "location": null,
+          "retweet_count": 134,
+          "favorite_count": 0,
+          "happened_at": 1596427285000,
+          "author": {
+            "id": 1037541129019842560,
+            "screen_name": "Minka51150356",
+            "name": "Minka",
+            "description": "#Deplorable #NRA #MAGA  #VoterID  #BuildtheWallNow #Trump2020  @Parler_app  https://t.co/8xjSjImBT8 \n\"I prefer dangerous freedom over peaceful slavery.\"\n- Thomas Jefferson",
+            "followers_count": 88387,
+            "friends_count": 12590,
+            "statuses_count": 54159
+          },
+          "country": null,
+          "hashtags": [
+            "endlockdownuk",
+            "COVID19"
+          ],
+          "mentions": [
+            {
+              "id": 1245256502518177792,
+              "screen_name": "CoronaDoubter",
+              "name": "End-The-Lockdown #nomasks"
+            }
+          ],
+          "parent_id": "1286939144971845632"
+        }
+      },
+      {
+        "_index": "tweets",
+        "_type": "_doc",
+        "_id": "1290015348570324993",
+        "_score": 1418.789,
+        "_source": {
+          "content": "“Normalcy will only return when we've largely vaccinated the ENTIRE global population” - Bill Gates \n\n#Covid19 #BillGates #COVID19 https://t.co/7Z0V07B8d7",
+          "location": null,
+          "retweet_count": 135,
+          "favorite_count": 208,
+          "happened_at": 1596398601000,
+          "author": {
+            "id": 40638800,
+            "screen_name": "Jimcorrsays",
+            "name": "Jim Corr",
+            "description": "Official Jim Corr Twitter account. Musician. Pilot. Vegetarian. ProSafeVax. Pro-life. Zero troll tolerance. Views my own.",
+            "followers_count": 39577,
+            "friends_count": 2071,
+            "statuses_count": 16561
+          },
+          "country": null,
+          "hashtags": [
+            "Covid19",
+            "BillGates",
+            "COVID19"
+          ],
+          "mentions": null,
+          "parent_id": null
+        }
+      },
+      {
+        "_index": "tweets",
+        "_type": "_doc",
+        "_id": "1286819522528206848",
+        "_score": 1265.5789,
+        "_source": {
+          "content": "This tweet by Bill Gates from Dec 19 2019 reveals his anticipation/certainty that 2020 will be a GREAT year for investing in vaccines.\nHow did he know about this provided that the #COVID19 outbreak and the enormous push for a corona-virus vaccine was months into the future? 🤔 https://t.co/3HfDRcweQz",
+          "location": null,
+          "retweet_count": 260,
+          "favorite_count": 329,
+          "happened_at": 1595636656000,
+          "author": {
+            "id": 884455440293269505,
+            "screen_name": "NikolovScience",
+            "name": "Ned Nikolov, Ph.D.",
+            "description": "Ph.D. Physical Scientist with a broad range of interests in various fields of science, i.e. climate, cosmology, astrophysics, nutrition, archaeology etc.",
+            "followers_count": 8273,
+            "friends_count": 73,
+            "statuses_count": 44230
+          },
+          "country": null,
+          "hashtags": [
+            "COVID19"
+          ],
+          "mentions": null,
+          "parent_id": null
+        }
+      },
+      {
+        "_index": "tweets",
+        "_type": "_doc",
+        "_id": "1289631632090116096",
+        "_score": 1255.0828,
+        "_source": {
+          "content": "RT @Frederic1L1: Bill Gates : Le vaccin du #COVID19 modifiera notre ARN et ADN avec la nano-technologie ! 👇(un brevet a été déposé par Micr…",
+          "location": null,
+          "retweet_count": 137,
+          "favorite_count": 0,
+          "happened_at": 1596307115000,
+          "author": {
+            "id": 1259133202511396864,
+            "screen_name": "Mona87284429",
+            "name": "Lola",
+            "description": "",
+            "followers_count": 20047,
+            "friends_count": 372,
+            "statuses_count": 25131
+          },
+          "country": null,
+          "hashtags": [
+            "COVID19"
+          ],
+          "mentions": [
+            {
+              "id": 903009000740052994,
+              "screen_name": "Frederic1L1",
+              "name": "Frederic Lesueur 🇫🇷🇺🇸"
+            }
+          ],
+          "parent_id": "1288211682364461058"
+        }
+      },
+      {
+        "_index": "tweets",
+        "_type": "_doc",
+        "_id": "1291472445837320196",
+        "_score": 1165.5245,
+        "_source": {
+          "content": "“Defeat #COVID19 by requiring vaccination for all. It's not un-American, it's patriotic.”\n\nAh yes, being patriotic means injecting a brand new, minimally tested, experimental vaccine into your body... for a virus with a 99.8% survival rate.🙄\n\nHere we go. https://t.co/UTJJbwKhWN",
+          "location": null,
+          "retweet_count": 105,
+          "favorite_count": 162,
+          "happened_at": 1596746000000,
+          "author": {
+            "id": 1499607608,
+            "screen_name": "sallyKP",
+            "name": "sally",
+            "description": "Vaccine risk awareness, informed consent, and medical freedom supporter.❤️✊🏼",
+            "followers_count": 23321,
+            "friends_count": 984,
+            "statuses_count": 14656
+          },
+          "country": null,
+          "hashtags": [
+            "COVID19"
+          ],
+          "mentions": null,
+          "parent_id": null
+        }
+      },
+      {
+        "_index": "tweets",
+        "_type": "_doc",
+        "_id": "1288211682364461058",
+        "_score": 1100.8525,
+        "_source": {
+          "content": "Bill Gates : Le vaccin du #COVID19 modifiera notre ARN et ADN avec la nano-technologie ! 👇(un brevet a été déposé par Microsoft avec le numéro 060606🤔...)\n#Trump https://t.co/sDDLvVxyBW",
+          "location": null,
+          "retweet_count": 137,
+          "favorite_count": 89,
+          "happened_at": 1595968573000,
+          "author": {
+            "id": 903009000740052994,
+            "screen_name": "Frederic1L1",
+            "name": "Frederic Lesueur 🇫🇷🇺🇸",
+            "description": "The truth is out there...\n#TRUMP2020 #DrainTheSwamp #MAGA  #Patriot #WWG1WGA  #Q #Socialismsucks #NoSharia #TeamPatriotes  IFB",
+            "followers_count": 49207,
+            "friends_count": 20004,
+            "statuses_count": 32678
+          },
+          "country": null,
+          "hashtags": [
+            "COVID19",
+            "Trump"
+          ],
+          "mentions": null,
+          "parent_id": null
+        }
+      }
+    ]
+  },
+  "aggregations": {
+    "hashtags": {
+      "doc_count_error_upper_bound": 69,
+      "sum_other_doc_count": 13412,
+      "buckets": [
+        {
+          "key": "COVID19",
+          "doc_count": 12488
+        },
+        {
+          "key": "coronavirus",
+          "doc_count": 791
+        },
+        {
+          "key": "vaccine",
+          "doc_count": 726
+        },
+        {
+          "key": "Coronavirus",
+          "doc_count": 325
+        },
+        {
+          "key": "vaccines",
+          "doc_count": 190
+        },
+        {
+          "key": "Latinus",
+          "doc_count": 144
+        },
+        {
+          "key": "Trump",
+          "doc_count": 144
+        },
+        {
+          "key": "BillGates",
+          "doc_count": 133
+        },
+        {
+          "key": "DopeyDon",
+          "doc_count": 132
+        },
+        {
+          "key": "InformaciónParaTi",
+          "doc_count": 131
+        }
+      ]
+    }
+  }
+}

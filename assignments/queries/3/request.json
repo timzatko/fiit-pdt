@@ -1,0 +1,50 @@
+{
+  "query": {
+    "bool": {
+      "filter": [
+        {
+          "range": {
+            "happened_at": {
+              "gte": 1596240000000,
+              "lte": 1598918399999
+            }
+          }
+        }
+      ]
+    }
+  },
+  "aggs": {
+    "august_days": {
+      "date_histogram": {
+        "field": "happened_at",
+        "calendar_interval": "day",
+        "format": "yyyy-MM-dd"
+      },
+      "aggs": {
+        "supporters": {
+          "filters": {
+            "filters": {
+              "bidenist": {
+                "match_phrase": {
+                  "author.description": "Joe Biden"
+                }
+              },
+              "trumpist": {
+                "match_phrase": {
+                  "author.description": "Donald Trump"
+                }
+              }
+            }
+          },
+          "aggs": {
+            "retweet_sum": {
+              "sum": {
+                "field": "retweet_count"
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

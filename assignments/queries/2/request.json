@@ -1,0 +1,79 @@
+{
+  "query": {
+    "function_score": {
+      "query": {
+        "bool": {
+          "must": [
+            {
+              "multi_match": {
+                "query": "gates s0ros vaccine micr0chip",
+                "fields": [
+                  "author.name.custom_shingles^6",
+                  "content^8",
+                  "author.description.custom_shingles^6",
+                  "author.screen_name.custom_ngram^10"
+                ],
+                "fuzziness": "auto"
+              }
+            }
+          ],
+          "filter": [
+            {
+              "term": {
+                "hashtags": "COVID19"
+              }
+            },
+            {
+              "range": {
+                "author.statuses_count": {
+                  "gt": 1000
+                }
+              }
+            }
+          ],
+          "should": {
+            "match": {
+              "mentions.name.custom_ngram": {
+                "query": "real",
+                "boost": 10
+              }
+            }
+          }
+        }
+      },
+      "functions": [
+        {
+          "filter": {
+            "range": {
+              "retweet_count": {
+                "gte": 100,
+                "lte": 500
+              }
+            }
+          },
+          "weight": 6
+        },
+        {
+          "filter": {
+            "range": {
+              "author.followers_count": {
+                "gt": 100
+              }
+            }
+          },
+          "weight": 3
+        }
+      ]
+    }
+  },
+  "aggs": {
+    "hashtags": {
+      "terms": {
+        "field": "hashtags",
+        "order": {
+          "_count": "desc"
+        }
+      }
+    }
+  }
+}
