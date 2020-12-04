@@ -20,7 +20,7 @@
     "author": {
       "properties": {
         "id": {
-          "type": "long"
+          "type": "keyword"
         },
         "screen_name": {
           "type": "text",
@@ -76,12 +76,12 @@
       }
     },
     "hashtags": {
-      "type": "text"
+      "type": "keyword"
     },
     "mentions": {
       "properties": {
         "id": {
-          "type": "long"
+          "type": "keyword"
         },
         "screen_name": {
           "type": "text",

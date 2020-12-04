@@ -172,7 +172,7 @@ func (q *Queue) process(rts []model.RawTweet, batchId int) {
 			Content:       rt.FullText,
 			RetweetCount:  rt.RetweetCount,
 			FavoriteCount: rt.FavoriteCount,
-			HappenedAt:    toTime(rt).Unix(),
+			HappenedAt:    toTime(rt).Unix() * 1000,
 			Location:      loc,
 			Country:       country,
 			Author:        author,

@@ -55,7 +55,7 @@ Trumpovci vs Bidenovci. Pracujte zo všetkými tweetami, ktoré máte a sú vytv
 
 Pri vytváraní analyzérov musím najskôr zatvoriť index pomocou: **POST** - `http://localhost:9200/tweets-2/_close`. Potom ho môžem otvoriť pomocou: **POST** - `http://localhost:9200/tweets-2/_open` 
 
-1. Vytvoríme analyzér *englando*.
+1. Podľa zadania vytvorím analyzér *englando*.
 
 **PUT:** `http://localhost:9200/tweets/_settings`
 
@@ -64,7 +64,7 @@ Body:
 {
     "analysis": {
         "analyzer": {
-            **"englando": {
+            "englando": {
                 "type": "custom",
                 "filter": [
                     "english_possessive_stemmer",
@@ -103,7 +103,7 @@ Response:
 }
 ```
 
-2. Vytovríme analyzér *custom_ngram*.
+2. Podľa zadania vytovrím analyzér *custom_ngram*.
 
 **PUT:** `http://localhost:9200/tweets/_settings`
 
@@ -146,7 +146,7 @@ Response:
 }
 ```
 
-3. Vytovríme analyzér *custom_shingles*.
+3. Podľa zadania vytvorím analyzér *custom_shingles*.
 
 Body:
 ```json
@@ -208,7 +208,7 @@ Vytvorené analyzéry použijem v mappingu, nový mapping bude vyzerať nasledov
     "author": {
       "properties": {
         "id": {
-          "type": "long"
+          "type": "keyword"
         },
         "screen_name": {
           "type": "text",
@@ -264,7 +264,7 @@ Vytvorené analyzéry použijem v mappingu, nový mapping bude vyzerať nasledov
       }
     },
     "hashtags": {
-      "type": "text"
+      "type": "keyword"
     },
     "mentions": {
       "properties": {
@@ -305,6 +305,19 @@ Vytvorené analyzéry použijem v mappingu, nový mapping bude vyzerať nasledov
 Následne som svoj index reindexoval.
 
 ### Časť 2. – vyhľadávanie
+
+Vyhľadajte vo vašich tweetoch spojenie "gates s0ros vaccine micr0chip". V query použite function_score, kde jednotlivé medzikroky sú nasledovné:
+
+Query:
+1. Must - vyhľadajte vo viacerých poliach (konkrétne: author.name (pomocou shingle), content (cez analyzovaný anglický text), author.description (pomocou shingles), author.screen_name (pomocou ngram)) spojenie "gates s0ros vaccine micr0chip", zapojte podporu pre preklepy, operátor je OR.
+1. Tieto polia vo vyhľadávaní boost-nite nasledovne - author.name * 6, content * 8, author.description * 6, author.screen_name * 10.
+1. Filter - vyfiltrujte len tie, ktoré majú author.statuses_count > 1000
+1. Should – boost-nite 10 krat tie, ktoré obsahujú v mentions.name (tento objekt je typu nested) cez ngram string "real".
+1. Nastavte podmienené váhy cez functions nasledovne:
+    1. retweet_count, ktorý je väčší rovný ako 100 a menší rovný ako 500 na 6,
+    1. author.followers_count väčší ako 100 na 3
+
+Zobrazte agregácie pre výsledky na konci. Vytvorte bucket hashtags podľa hashtagov a spočítajte hodnoty výskytov (na webe by to mohli byť facety). Následne “vyberte” ten, ktorý má najväčší počet a pridajte ho do filtra.
 
 
 ### Časť 3. – agregácie

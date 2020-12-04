@@ -18,7 +18,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n    \"dynamic\": \"strict\",\n    \"properties\": {\n        \"id\": {\n            \"type\": \"text\"\n        },\n        \"content\": {\n            \"type\": \"text\"\n        },\n        \"location\": {\n            \"type\": \"geo_point\"\n        },\n        \"retweet_count\": {\n            \"type\": \"integer\"\n        },\n        \"favorite_count\": {\n            \"type\": \"integer\"\n        },\n        \"happened_at\": {\n            \"type\": \"date\"\n        },\n        \"author\": {\n            \"properties\": {\n                \"id\": {\n                    \"type\": \"long\"\n                },\n                \"screen_name\": {\n                    \"type\": \"text\"\n                },\n                \"name\": {\n                    \"type\": \"text\"\n                },\n                \"description\": {\n                    \"type\": \"text\"\n                },\n                \"followers_count\": {\n                    \"type\": \"integer\"\n                },\n                \"friends_count\": {\n                    \"type\": \"integer\"\n                },\n                \"statuses_count\": {\n                    \"type\": \"integer\"\n                }\n            }\n        },\n        \"country\": {\n            \"properties\": {\n                \"code\": {\n                    \"type\": \"keyword\"\n                },\n                \"name\": {\n                    \"type\": \"text\"\n                }\n            }\n        },\n        \"hashtags\": {\n            \"type\": \"text\"\n        },\n        \"mentions\": {\n            \"properties\": {\n                \"id\": {\n                    \"type\": \"long\"\n                },\n                \"screen_name\": {\n                    \"type\": \"text\"\n                },\n                \"name\": {\n                    \"type\": \"text\"\n                }\n            }\n        },\n        \"parent_id\": {\n            \"type\": \"text\"\n        }\n    }\n}"
+					"raw": "{\n  \"dynamic\": \"strict\",\n  \"properties\": {\n    \"content\": {\n      \"type\": \"text\",\n      \"analyzer\": \"englando\"\n    },\n    \"location\": {\n      \"type\": \"geo_point\"\n    },\n    \"retweet_count\": {\n      \"type\": \"integer\"\n    },\n    \"favorite_count\": {\n      \"type\": \"integer\"\n    },\n    \"happened_at\": {\n      \"type\": \"date\",\n      \"format\": \"strict_date_optional_time||epoch_second\"\n    },\n    \"author\": {\n      \"properties\": {\n        \"id\": {\n          \"type\": \"long\"\n        },\n        \"screen_name\": {\n          \"type\": \"text\",\n          \"fields\": {\n            \"ngram\": {\n              \"type\": \"text\",\n              \"analyzer\": \"custom_ngram\"\n            }\n          }\n        },\n        \"name\": {\n          \"type\": \"text\",\n          \"fields\": {\n            \"shingles\": {\n              \"type\": \"text\",\n              \"analyzer\": \"custom_shingles\"\n            },\n            \"ngram\": {\n              \"type\": \"text\",\n              \"analyzer\": \"custom_ngram\"\n            }\n          }\n        },\n        \"description\": {\n          \"type\": \"text\",\n          \"analyzer\": \"englando\",\n          \"fields\": {\n            \"shingles\": {\n              \"type\": \"text\",\n              \"analyzer\": \"custom_shingles\"\n            }\n          }\n        },\n        \"followers_count\": {\n          \"type\": \"integer\"\n        },\n        \"friends_count\": {\n          \"type\": \"integer\"\n        },\n        \"statuses_count\": {\n          \"type\": \"integer\"\n        }\n      }\n    },\n    \"country\": {\n      \"properties\": {\n        \"code\": {\n          \"type\": \"keyword\"\n        },\n        \"name\": {\n          \"type\": \"text\"\n        }\n      }\n    },\n    \"hashtags\": {\n      \"type\": \"text\"\n    },\n    \"mentions\": {\n      \"properties\": {\n        \"id\": {\n          \"type\": \"long\"\n        },\n        \"screen_name\": {\n          \"type\": \"text\",\n          \"fields\": {\n            \"ngram\": {\n              \"type\": \"text\",\n              \"analyzer\": \"custom_ngram\"\n            }\n          }\n        },\n        \"name\": {\n          \"type\": \"text\",\n          \"fields\": {\n            \"shingles\": {\n              \"type\": \"text\",\n              \"analyzer\": \"custom_shingles\"\n            },\n            \"ngram\": {\n              \"type\": \"text\",\n              \"analyzer\": \"custom_ngram\"\n            }\n          }\n        }\n      }\n    },\n    \"parent_id\": {\n      \"type\": \"keyword\"\n    }\n  }\n}"
 				},
 				"url": {
 					"raw": "http://localhost:9200/tweets/_mapping",
@@ -69,7 +69,7 @@
 			"response": []
 		},
 		{
-			"name": "GET Tweets",
+			"name": "GET Tweets Search 3",
 			"protocolProfileBehavior": {
 				"disableBodyPruning": true
 			},
@@ -84,7 +84,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n   \"size\": 10,\n   \"query\": {\n      \"match_all\": {}\n   }\n}"
+					"raw": "{\n    \"query\": {\n        \"bool\": {\n            \"filter\": [\n                {\n                    \"range\": {\n                        \"happened_at\": {\n                            \"gte\": 1596240000000,\n                            \"lte\": 1598918399000\n                        }\n                    }\n                }\n            ]\n        }\n    },\n    \"aggs\": {\n        \"august_days\": {\n            \"date_histogram\": {\n                \"field\": \"happened_at\",\n                \"calendar_interval\": \"day\"\n            },\n            \"aggs\": {\n                \"supporters\": {\n                    \"filters\": {\n                        \"filters\": {\n                            \"bidenist\": {\n                                \"match_phrase\": {\n                                    \"author.description\": \"Joe Biden\"\n                                }\n                            },\n                            \"trumpist\": {\n                                \"match_phrase\": {\n                                    \"author.description\": \"Donald Trump\"\n                                }\n                            }\n                        }\n                    },\n                    \"aggs\": {\n                        \"retweet_sum\": {\n                            \"sum\": {\n                                \"field\": \"retweet_count\"\n                            }\n                        }\n                    }\n                }\n            }\n        }\n    }\n}"
 				},
 				"url": {
 					"raw": "http://localhost:9200/tweets/_search",
@@ -96,6 +96,65 @@
 					"path": [
 						"tweets",
 						"_search"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "GET Tweets Search 2",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"query\": {\n        \"function_score\": {\n            \"query\": {\n                \"bool\": {\n                    \"must\": [\n                        {\n                            \"multi_match\": {\n                                \"query\": \"gates s0ros vaccine micr0chip\",\n                                \"fields\": [\n                                    \"author.name.custom_shingles^6\",\n                                    \"content^8\",\n                                    \"author.description.custom_shingles^6\",\n                                    \"author.screen_name.custom_ngram^10\"\n                                ],\n                                \"fuzziness\": \"auto\"\n                            }\n                        }\n                    ],\n                    \"filter\": [\n                        {\n                            \"range\": {\n                                \"author.statuses_count\": {\n                                    \"gt\": 1000\n                                }\n                            }\n                        },\n                        {\n                            \"term\": {\n                                \"hashtags\": \"COVID19\"\n                            }\n                        }\n                    ],\n                    \"should\": {\n                        \"match\": {\n                            \"mentions.name.custom_ngram\": {\n                                \"query\": \"real\",\n                                \"boost\": 10\n                            }\n                        }\n                    }\n                }\n            },\n            \"functions\": [\n                {\n                    \"filter\": {\n                        \"range\": {\n                            \"retweet_count\": {\n                                \"gte\": 100,\n                                \"lte\": 500\n                            }\n                        }\n                    },\n                    \"weight\": 6\n                },\n                {\n                    \"filter\": {\n                        \"range\": {\n                            \"author.followers_count\": {\n                                \"gt\": 100\n                            }\n                        }\n                    },\n                    \"weight\": 3\n                }\n            ]\n        }\n    },\n    \"aggs\": {\n        \"hashtags\": {\n            \"terms\": {\n                \"field\": \"hashtags\",\n                \"order\": {\n                    \"_count\": \"desc\"\n                }\n            }\n        }\n    }\n}"
+				},
+				"url": {
+					"raw": "http://localhost:9200/tweets/_search",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "9200",
+					"path": [
+						"tweets",
+						"_search"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "GET Tweets Count",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"url": {
+					"raw": "http://localhost:9200/tweets/_count",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "9200",
+					"path": [
+						"tweets",
+						"_count"
 					]
 				}
 			},
@@ -114,17 +173,18 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n  \"settings\": {\n    \"number_of_shards\": 3,\n    \"number_of_replicas\": 3\n  }\n}"
+					"raw": "{\n  \"settings\": {\n    \"number_of_shards\": 3,\n    \"number_of_replicas\": 0\n  }\n}"
 				},
 				"url": {
-					"raw": "http://localhost:9200/tweets",
+					"raw": "http://localhost:9200/tweets-2/_settings",
 					"protocol": "http",
 					"host": [
 						"localhost"
 					],
 					"port": "9200",
 					"path": [
-						"tweets"
+						"tweets-2",
+						"_settings"
 					]
 				}
 			},
@@ -219,6 +279,198 @@
 					"path": [
 						"tweets",
 						"_bulk"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "GET Nodes",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:9200/_cat/nodes",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "9200",
+					"path": [
+						"_cat",
+						"nodes"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "GET Shards",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:9200/_cat/shards",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "9200",
+					"path": [
+						"_cat",
+						"shards"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "PUT Tweet",
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"content\": \"RT @TechnicalGuruji: Hello guys...Giving away these Airpods Pro to you...\\nStep 1 - Follow @TechnicalGuruji...\\nStep 2 - Retweet this tweet..…\",\n    \"location\": null,\n    \"retweet_count\": 34976,\n    \"favorite_count\": 0,\n    \"happened_at\": 1596260301,\n    \"author\": {\n        \"id\": 763629964763631616,\n        \"screen_name\": \"Meashishpatel\",\n        \"name\": \"ashish patel\",\n        \"description\": \"INDIAN🇮🇳🇮🇳🇮🇳🇮🇳 ||Student||MBA||Dreamer||2021 IAS Officer||Fan Of M.S.Dhoni ||Marval Fan ||Reader||Cheerful Mood|| The Man with Simplicity|| Beardboy ||\",\n        \"followers_count\": 348,\n        \"friends_count\": 231,\n        \"statuses_count\": 37\n    },\n    \"country\": null,\n    \"hashtags\": null,\n    \"mentions\": [\n        {\n            \"id\": 3992637442,\n            \"screen_name\": \"TechnicalGuruji\",\n            \"name\": \"Gaurav Chaudhary\"\n        },\n        {\n            \"id\": 3992637442,\n            \"screen_name\": \"TechnicalGuruji\",\n            \"name\": \"Gaurav Chaudhary\"\n        }\n    ],\n    \"parent_id\": \"1289181743359164418\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:9200/tweets/_doc/1289435277660844032",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "9200",
+					"path": [
+						"tweets",
+						"_doc",
+						"1289435277660844032"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "GET Tweet",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:9200/tweets/_doc/1289435277660844032",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "9200",
+					"path": [
+						"tweets",
+						"_doc",
+						"1289435277660844032"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "DELETE Tweet",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:9200/tweets/_doc/1289435277660844032",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "9200",
+					"path": [
+						"tweets",
+						"_doc",
+						"1289435277660844032"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "GENERAL",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"script\": \"ctx._source.retweet_count += 1\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:9200/tweets/_update/1289435277660844032",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "9200",
+					"path": [
+						"tweets",
+						"_update",
+						"1289435277660844032"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "PUT Tweets Analyzer",
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"index\": {\n    \"max_ngram_diff\": 9\n  },\n  \"analysis\": {\n    \"analyzer\": {\n      \"englando\": {\n        \"type\": \"custom\",\n        \"filter\": [\n          \"english_possessive_stemmer\",\n          \"lowercase\",\n          \"english_stop\",\n          \"english_stemmer\"\n        ],\n        \"char_filter\": [\n          \"html_strip\"\n        ],\n        \"tokenizer\": \"standard\"\n      },\n      \"custom_ngram\": {\n        \"type\": \"custom\",\n        \"filter\": [\n          \"lowercase\",\n          \"asciifolding\",\n          \"filter_ngram\"\n        ],\n        \"char_filter\": [\n          \"html_strip\"\n        ],\n        \"tokenizer\": \"standard\"\n      },\n      \"custom_shingles\": {\n        \"type\": \"custom\",\n        \"filter\": [\n          \"lowercase\",\n          \"asciifolding\",\n          \"filter_shingles\"\n        ],\n        \"char_filter\": [\n          \"html_strip\"\n        ],\n        \"tokenizer\": \"standard\"\n      }\n    },\n    \"filter\": {\n      \"filter_ngram\": {\n        \"type\": \"ngram\",\n        \"min_gram\": 1,\n        \"max_gram\": 10\n      },\n      \"english_possessive_stemmer\": {\n        \"type\": \"stemmer\",\n        \"language\": \"possessive_english\"\n      },\n      \"english_stop\": {\n        \"type\": \"stop\",\n        \"stopwords\": \"_english_\"\n      },\n      \"english_stemmer\": {\n        \"type\": \"stemmer\",\n        \"language\": \"english\"\n      },\n      \"filter_shingles\": {\n        \"type\": \"shingle\",\n        \"token_separator\": \"\"\n      }\n    }\n  }\n}"
+				},
+				"url": {
+					"raw": "http://localhost:9200/tweets-2/_settings",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "9200",
+					"path": [
+						"tweets-2",
+						"_settings"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "PUT Tweets Close",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:9200/tweets-2/_close",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "9200",
+					"path": [
+						"tweets-2",
+						"_close"
 					]
 				}
 			},
