@@ -1,8 +1,8 @@
-# 6. Zadanie: Elastic Search
+# 7. Zadanie: Elastic Search
 
 **Timotej Zaťko**
 
-## Zadanie:
+## Zadanie
 
 ### Časť 1. – analyzéry a mapovanie
 
